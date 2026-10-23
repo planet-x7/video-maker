@@ -36,11 +36,14 @@ h1{text-align:center;font-size:19px;font-weight:700;letter-spacing:.04em;margin:
 #out video{display:block;width:70%;margin:12px auto;border-radius:16px}
 #out .go{margin-top:8px}
 .hint{font-size:12px;color:#8e8e93;text-align:center}
+#cimgs .btn{background:#fff;margin:0 0 14px}
+.wipe{display:block;margin:26px auto 0;border:0;background:transparent;color:#a0a0a8;font-size:12px;text-decoration:underline}
 </style>
 </head>
 <body>
 <h1>Momiji_X</h1>
 <div id="post"></div>
+<div id="cimgs"></div>
 <div id="sets"></div>
 <button class="add" id="add">＋ コメントを追加</button>
 <div class="opt"><span>話者 : 四国めたん</span><span>速度 <input type="number" id="spd" value="1" step="0.05" min="0.5" max="2"></span><span>間隔 <input type="number" id="gap" value="0.4" step="0.1" min="0"> 秒</span></div>
@@ -49,6 +52,7 @@ h1{text-align:center;font-size:19px;font-weight:700;letter-spacing:.04em;margin:
 <canvas id="cv" width="1080" height="1920"></canvas>
 <div id="out"></div>
 <p class="hint" id="credit"></p>
+<button class="wipe" id="wipe" type="button">保存データをすべて消す</button>
 
 <script>
 const W=1080,H=1920,BG="#EAFAFF";
@@ -56,9 +60,9 @@ const cv=document.getElementById("cv"),ctx=cv.getContext("2d");
 const $=id=>document.getElementById(id);
 const sets=[];
 const SPK=2;
-const FX1="という投稿が話題になっている/ネットでは",FX2="などの反応があった";
-const fx1={fixed:true,lines:[FX1],fixedText:"という投稿が話題になっている。ネットでは"};
-const fx2={fixed:true,lines:[FX2],fixedText:FX2};
+const fx1a={fixed:true,lines:["という投稿が/話題になっている"],fixedText:"という投稿が話題になっている",gapAfter:0.5};
+const fx1b={fixed:true,lines:["ネットでは"],fixedText:"ネットでは"};
+const fx2={fixed:true,lines:["などの反応があった"],fixedText:"などの反応があった",one:true};
 
 function drawBase(){ctx.fillStyle=BG;ctx.fillRect(0,0,W,H)}
 function wrap(t,max){
@@ -72,12 +76,12 @@ function wrap(t,max){
   }
   return lines;
 }
-function drawFrame(img,text,fy){
+function drawFrame(img,text,fy,one){
   drawBase();
   ctx.fillStyle="#000";ctx.textAlign="center";ctx.textBaseline="middle";
   let fs=110,lines;
   const fam='"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif';
-  for(;fs>=64;fs-=6){ctx.font="900 "+fs+"px "+fam;lines=wrap(text,W*0.88);if(lines.length<=2)break}
+  for(;fs>=48;fs-=4){ctx.font="900 "+fs+"px "+fam;lines=wrap(text,W*0.9);if(lines.length<=(one?1:2))break}
   const lh=fs*1.3,cy=H*0.27;
   lines.forEach((l,i)=>ctx.fillText(l,W/2,cy+(i-(lines.length-1)/2)*lh));
   if(img){
@@ -96,10 +100,12 @@ function fileBtn(label,multi,accept,onpick){
   if(accept)inp.accept=accept;
   b.onclick=()=>inp.click();
   inp.onchange=()=>{
-    const n=inp.files.length;
-    b.textContent=n?("✓ "+(n>1?n+"枚":inp.files[0].name.slice(0,18))):label;
-    onpick(inp.files);
+    const fl=[...inp.files];
+    wrap.set(fl.length?("✓ "+(fl.length>1?fl.length+"枚":fl[0].name.slice(0,18))):label);
+    onpick(fl);
   };
+  wrap.set=t=>{b.textContent=t};
+  wrap.reset=()=>{b.textContent=label;inp.value=""};
   wrap.append(b,inp);return wrap;
 }
 function mkTa(ph,cls){const t=document.createElement("textarea");t.className="ta"+(cls?" "+cls:"");t.placeholder=ph;return t}
@@ -109,60 +115,88 @@ async function loadImg(f){
   return {url,el};
 }
 
+let ready=false,saveT;
+function save(){if(!ready)return;clearTimeout(saveT);saveT=setTimeout(doSave,400)}
+const dbp=new Promise((res,rej)=>{const r=indexedDB.open("momijix",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+async function idbGet(k){const db=await dbp;return new Promise((res,rej)=>{const q=db.transaction("kv").objectStore("kv").get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
+async function idbSet(k,v){const db=await dbp;return new Promise((res,rej)=>{const t=db.transaction("kv","readwrite");t.objectStore("kv").put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error)})}
+async function doSave(){
+  try{await idbSet("state",{spd:$("spd").value,gap:$("gap").value,
+    post:{ta:post.ta.value,rd:post.rd.value,imgs:post.imgs.map(o=>o.file),file:post.file},
+    sets:sets.map(s=>({ta:s.ta.value,rd:s.rd.value,img:s.imgFile,file:s.file}))})}catch(e){}
+}
+document.addEventListener("input",save);
+
 function addSet(){
-  const s={img:null,file:null};
+  const s={img:null,imgFile:null,file:null};
   const card=document.createElement("div");card.className="blk";
   const h=document.createElement("h2");
   h.innerHTML='<span class="ttl"></span><button class="sub del" type="button">削除</button>';
   const pv=document.createElement("img");pv.className="pv";
   s.ta=mkTa("字幕");s.rd=mkTa("読み上げ修正","s");s.card=card;
-  card.append(h,
-    fileBtn("画像を選択",false,"image/*",async fl=>{
-      if(!fl[0])return;
-      const o=await loadImg(fl[0]);s.img=o.el;pv.src=o.url;pv.style.display="block";
-    }),
-    pv,s.ta,s.rd,
-    fileBtn("音声ファイルを選択",false,"",fl=>{s.file=fl[0]||null}));
+  s.imgBtn=fileBtn("画像を選択",false,"image/*",fl=>{if(fl[0])s.setImg(fl[0])});
+  s.audBtn=fileBtn("音声ファイルを選択",false,"",fl=>{s.setAudio(fl[0]||null)});
+  s.setImg=async f=>{
+    const o=await loadImg(f);
+    s.img=o.el;s.imgFile=f;pv.src=o.url;pv.style.display="block";
+    s.imgBtn.set("✓ "+(f.name||"画像").slice(0,18));save();
+  };
+  s.setAudio=f=>{s.file=f;s.audBtn.set(f?"✓ "+f.name.slice(0,18):"音声ファイルを選択");save()};
+  s.clear=()=>{
+    s.img=null;s.imgFile=null;s.file=null;pv.style.display="none";
+    s.ta.value="";s.rd.value="";s.imgBtn.reset();s.audBtn.reset();save();
+  };
+  card.append(h,s.imgBtn,pv,s.ta,s.rd,s.audBtn);
   h.querySelector(".del").onclick=()=>{
-    if(sets.length<2)return;
-    sets.splice(sets.indexOf(s),1);card.remove();renum();
+    if(sets.length<2){s.clear();return}
+    sets.splice(sets.indexOf(s),1);card.remove();renum();save();
   };
   sets.push(s);$("sets").appendChild(card);renum();
+  return s;
 }
 const post={imgs:[],file:null,isPost:true};
 function buildPost(){
   const s=post;
   const card=document.createElement("div");card.className="blk";
-  const h=document.createElement("h2");h.innerHTML='<span class="ttl">ポスト本文</span>';
+  const h=document.createElement("h2");
+  h.innerHTML='<span class="ttl">ポスト本文</span><button class="sub del" type="button">削除</button>';
   const th=document.createElement("div");th.className="thumbs";
   const render=()=>{
     th.innerHTML="";
     s.imgs.forEach((o,i)=>{
       const d=document.createElement("div");d.className="th";
       d.innerHTML='<img src="'+o.url+'"><div>'+(i+1)+'</div>';
-      if(i>0){const b=document.createElement("button");b.type="button";b.textContent="←";b.onclick=()=>{[s.imgs[i-1],s.imgs[i]]=[s.imgs[i],s.imgs[i-1]];render()};d.appendChild(b)}
+      if(i>0){const b=document.createElement("button");b.type="button";b.textContent="←";b.onclick=()=>{[s.imgs[i-1],s.imgs[i]]=[s.imgs[i],s.imgs[i-1]];render();save()};d.appendChild(b)}
       th.appendChild(d);
     });
   };
   s.ta=mkTa("字幕(1行 = 画像1枚)");s.rd=mkTa("読み上げ修正","s");s.card=card;
-  card.append(h,
-    fileBtn("画像を選択",true,"image/*",async fl=>{
-      s.imgs=[];
-      for(const f of fl)s.imgs.push(await loadImg(f));
-      render();
-    }),
-    th,s.ta,s.rd,
-    fileBtn("音声ファイルを選択",false,"",fl=>{s.file=fl[0]||null}));
+  s.imgBtn=fileBtn("画像を選択",true,"image/*",fl=>s.setImgs(fl));
+  s.audBtn=fileBtn("音声ファイルを選択",false,"",fl=>s.setAudio(fl[0]||null));
+  s.setImgs=async fl=>{
+    s.imgs=[];
+    for(const f of fl){const o=await loadImg(f);o.file=f;s.imgs.push(o)}
+    render();s.imgBtn.set(fl.length?"✓ "+fl.length+"枚":"画像を選択");save();
+  };
+  s.setAudio=f=>{s.file=f;s.audBtn.set(f?"✓ "+f.name.slice(0,18):"音声ファイルを選択");save()};
+  h.querySelector(".del").onclick=()=>{
+    s.imgs=[];s.file=null;s.ta.value="";s.rd.value="";render();s.imgBtn.reset();s.audBtn.reset();save();
+  };
+  card.append(h,s.imgBtn,th,s.ta,s.rd,s.audBtn);
   $("post").appendChild(card);
 }
 buildPost();
+const cb=fileBtn("コメント画像をまとめて選択",true,"image/*",async fl=>{
+  for(let i=0;i<fl.length;i++){while(sets.length<=i)addSet();await sets[i].setImg(fl[i])}
+  cb.reset();
+});
+$("cimgs").appendChild(cb);
 function renum(){
   sets.forEach((s,i)=>{
     s.card.querySelector(".ttl").textContent="コメント "+(i+1);
-    s.card.querySelector(".del").style.display=sets.length>1?"":"none";
   });
 }
-$("add").onclick=()=>{addSet();sets[sets.length-1].card.scrollIntoView({behavior:"smooth"})};
+$("add").onclick=()=>{addSet();save();sets[sets.length-1].card.scrollIntoView({behavior:"smooth"})};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function synth(text,speaker){
   for(let n=0;n<6;n++){
@@ -216,12 +250,34 @@ function stretch(buf,rate,ac){
   for(let i=0;i<len;i++)o[i]=ws[i]>1e-3?y[i]/ws[i]:0;
   return out;
 }
-addSet();drawBase();
+async function restore(){
+  let d=null;
+  try{d=await idbGet("state")}catch(e){}
+  if(d&&d.post){
+    $("spd").value=d.spd||1;$("gap").value=d.gap||0.4;
+    post.ta.value=d.post.ta||"";post.rd.value=d.post.rd||"";
+    if(d.post.imgs&&d.post.imgs.length)await post.setImgs(d.post.imgs);
+    if(d.post.file)post.setAudio(d.post.file);
+    for(const x of (d.sets&&d.sets.length?d.sets:[{}])){
+      const s=addSet();s.ta.value=x.ta||"";s.rd.value=x.rd||"";
+      if(x.img)await s.setImg(x.img);
+      if(x.file)s.setAudio(x.file);
+    }
+  }else addSet();
+  ready=true;
+}
+restore();drawBase();
+$("wipe").onclick=async()=>{
+  if(!confirm("入力した内容と選んだ画像・音声をすべて消します。よろしいですか?"))return;
+  ready=false;
+  try{await idbSet("state",null)}catch(e){}
+  location.reload();
+};
 
 $("go").onclick=async()=>{
   const st=$("st");
   const active=post.imgs.length>0||post.ta.value.trim()!=="";
-  const all=[...(active?[post,fx1]:[]),...sets,fx2];
+  const all=[...(active?[post,fx1a,fx1b]:[]),...sets,fx2];
   const lab=s=>s===post?"ポスト本文":s.fixed?"固定文":"コメント"+(sets.indexOf(s)+1);
   for(const s of all){
     if(s.fixed)continue;
@@ -240,7 +296,8 @@ $("go").onclick=async()=>{
     const by=H*0.36,bh=H*0.52;let mh=0;
     for(const o of post.imgs){const r=Math.min(W/o.el.naturalWidth,(H-by)/o.el.naturalHeight);mh=Math.max(mh,o.el.naturalHeight*r)}
     postY=Math.max(by,by+(bh-mh)/2);
-    fx1.img=post.imgs[post.imgs.length-1].el;fx1.fy=postY;
+    const lastImg=post.imgs[post.imgs.length-1].el;
+    fx1a.img=fx1b.img=lastImg;fx1a.fy=fx1b.fy=postY;
   }
   fx2.img=sets[sets.length-1].img;
   $("go").disabled=true;$("out").innerHTML="";
@@ -261,17 +318,17 @@ $("go").onclick=async()=>{
         s.raw=await new Promise((res,rej)=>ac.decodeAudioData(ab,res,rej));s.key=key;
       }
       s.buf=stretch(s.raw,spd,ac);
-      s.dur=s.buf.duration;s.t0=acc;acc+=s.dur+gap;
+      s.dur=s.buf.duration;s.t0=acc;acc+=s.dur+(s.gapAfter!==undefined?s.gapAfter:gap);
       const tot=s.lines.reduce((a,l)=>a+Math.max(l.replace(/\//g,"").length,1),0);
       let a2=0;
       s.segs=s.lines.map((l,idx)=>{const w=Math.max(l.replace(/\//g,"").length,1);const o={i:idx,text:l,t0:s.t0+a2/tot*s.dur,t1:s.t0+(a2+w)/tot*s.dur};a2+=w;return o});
     }
-    const total=acc-gap;
+    const lastS=all[all.length-1];const total=lastS.t0+lastS.dur;
     const frameAt=t=>{
       let cur=all[0];
       for(const s of all){if(s.t0<=t)cur=s}
       const seg=cur.segs.find(g=>t>=g.t0&&t<g.t1)||(t<cur.t0+cur.dur?cur.segs[0]:cur.segs[cur.segs.length-1]);
-      return cur.isPost?[post.imgs[seg.i].el,seg.text,postY]:[cur.img,seg.text,cur.fy];
+      return cur.isPost?[post.imgs[seg.i].el,seg.text,postY]:[cur.img,seg.text,cur.fy,cur.one];
     };
     const dest=ac.createMediaStreamDestination();
     const stream=cv.captureStream(30);
