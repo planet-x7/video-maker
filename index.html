@@ -13,8 +13,9 @@ h1{text-align:center;font-size:19px;font-weight:700;letter-spacing:.04em;margin:
 .blk h2{display:flex;justify-content:space-between;align-items:center;margin:0 0 12px;font-size:14px;font-weight:600;color:#8e8e93}
 .blk h2::before{content:"0" counter(n);color:#c2c2c8;letter-spacing:.1em;margin-right:10px}
 .blk h2 .ttl{flex:1}
-#post .blk{counter-increment:none}
-#post .blk h2::before{content:none}
+#post .blk,#ttlbox .blk{counter-increment:none}
+#post .blk h2::before,#ttlbox .blk h2::before{content:none}
+.hb{display:flex;gap:6px}
 .btn{display:block;width:100%;border:0;background:#f2f2f4;color:#111;border-radius:99px;padding:12px;font-size:15px;margin-bottom:10px}
 .blk>div:last-child .btn{margin-bottom:0}
 .sub{border:0;background:#f2f2f4;color:#8e8e93;border-radius:99px;padding:5px 12px;font-size:12px}
@@ -42,6 +43,7 @@ h1{text-align:center;font-size:19px;font-weight:700;letter-spacing:.04em;margin:
 </head>
 <body>
 <h1>Momiji_X</h1>
+<div id="ttlbox"></div>
 <div id="post"></div>
 <div id="cimgs"></div>
 <div id="sets"></div>
@@ -60,7 +62,7 @@ const cv=document.getElementById("cv"),ctx=cv.getContext("2d");
 const $=id=>document.getElementById(id);
 const sets=[];
 const SPK=2;
-const fx1a={fixed:true,lines:["という投稿が/話題になっている"],fixedText:"という投稿が話題になっている",gapAfter:0.5};
+const fx1a={fixed:true,lines:["という投稿が/話題になっている"],fixedText:"という投稿が話題になっている",gapAfter:0.2};
 const fx1b={fixed:true,lines:["ネットでは"],fixedText:"ネットでは"};
 const fx2={fixed:true,lines:["などの反応があった"],fixedText:"などの反応があった",one:true};
 
@@ -108,6 +110,12 @@ function fileBtn(label,multi,accept,onpick){
   wrap.reset=()=>{b.textContent=label;inp.value=""};
   wrap.append(b,inp);return wrap;
 }
+function insSlash(t){
+  const a=t.selectionStart==null?t.value.length:t.selectionStart,b=t.selectionEnd==null?a:t.selectionEnd;
+  t.value=t.value.slice(0,a)+"/"+t.value.slice(b);
+  t.focus();try{t.setSelectionRange(a+1,a+1)}catch(e){}
+  save();
+}
 function mkTa(ph,cls){const t=document.createElement("textarea");t.className="ta"+(cls?" "+cls:"");t.placeholder=ph;return t}
 async function loadImg(f){
   const url=URL.createObjectURL(f),el=new Image();el.src=url;
@@ -121,7 +129,7 @@ const dbp=new Promise((res,rej)=>{const r=indexedDB.open("momijix",1);r.onupgrad
 async function idbGet(k){const db=await dbp;return new Promise((res,rej)=>{const q=db.transaction("kv").objectStore("kv").get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
 async function idbSet(k,v){const db=await dbp;return new Promise((res,rej)=>{const t=db.transaction("kv","readwrite");t.objectStore("kv").put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error)})}
 async function doSave(){
-  try{await idbSet("state",{spd:$("spd").value,gap:$("gap").value,
+  try{await idbSet("state",{title:titleTa.value,spd:$("spd").value,gap:$("gap").value,
     post:{ta:post.ta.value,rd:post.rd.value,imgs:post.imgs.map(o=>o.file),file:post.file},
     sets:sets.map(s=>({ta:s.ta.value,rd:s.rd.value,img:s.imgFile,file:s.file}))})}catch(e){}
 }
@@ -131,9 +139,9 @@ function addSet(){
   const s={img:null,imgFile:null,file:null};
   const card=document.createElement("div");card.className="blk";
   const h=document.createElement("h2");
-  h.innerHTML='<span class="ttl"></span><button class="sub del" type="button">削除</button>';
+  h.innerHTML='<span class="ttl"></span><span class="hb"><button class="sub sl" type="button">／</button><button class="sub del" type="button">削除</button></span>';
   const pv=document.createElement("img");pv.className="pv";
-  s.ta=mkTa("字幕");s.rd=mkTa("読み上げ修正","s");s.card=card;
+  s.ta=mkTa("字幕(改行で字幕を切り替え。／で字幕の中で改行)");s.rd=mkTa("読み上げ修正","s");s.card=card;
   s.imgBtn=fileBtn("画像を選択",false,"image/*",fl=>{if(fl[0])s.setImg(fl[0])});
   s.audBtn=fileBtn("音声ファイルを選択",false,"",fl=>{s.setAudio(fl[0]||null)});
   s.setImg=async f=>{
@@ -147,6 +155,7 @@ function addSet(){
     s.ta.value="";s.rd.value="";s.imgBtn.reset();s.audBtn.reset();save();
   };
   card.append(h,s.imgBtn,pv,s.ta,s.rd,s.audBtn);
+  h.querySelector(".sl").onclick=()=>insSlash(s.ta);
   h.querySelector(".del").onclick=()=>{
     if(sets.length<2){s.clear();return}
     sets.splice(sets.indexOf(s),1);card.remove();renum();save();
@@ -159,7 +168,7 @@ function buildPost(){
   const s=post;
   const card=document.createElement("div");card.className="blk";
   const h=document.createElement("h2");
-  h.innerHTML='<span class="ttl">ポスト本文</span><button class="sub del" type="button">削除</button>';
+  h.innerHTML='<span class="ttl">ポスト本文</span><span class="hb"><button class="sub sl" type="button">／</button><button class="sub del" type="button">削除</button></span>';
   const th=document.createElement("div");th.className="thumbs";
   const render=()=>{
     th.innerHTML="";
@@ -170,7 +179,7 @@ function buildPost(){
       th.appendChild(d);
     });
   };
-  s.ta=mkTa("字幕(1行 = 画像1枚)");s.rd=mkTa("読み上げ修正","s");s.card=card;
+  s.ta=mkTa("字幕(1行 = 画像1枚。／で字幕の中で改行)");s.rd=mkTa("読み上げ修正","s");s.card=card;
   s.imgBtn=fileBtn("画像を選択",true,"image/*",fl=>s.setImgs(fl));
   s.audBtn=fileBtn("音声ファイルを選択",false,"",fl=>s.setAudio(fl[0]||null));
   s.setImgs=async fl=>{
@@ -179,6 +188,7 @@ function buildPost(){
     render();s.imgBtn.set(fl.length?"✓ "+fl.length+"枚":"画像を選択");save();
   };
   s.setAudio=f=>{s.file=f;s.audBtn.set(f?"✓ "+f.name.slice(0,18):"音声ファイルを選択");save()};
+  h.querySelector(".sl").onclick=()=>insSlash(s.ta);
   h.querySelector(".del").onclick=()=>{
     s.imgs=[];s.file=null;s.ta.value="";s.rd.value="";render();s.imgBtn.reset();s.audBtn.reset();save();
   };
@@ -186,6 +196,24 @@ function buildPost(){
   $("post").appendChild(card);
 }
 buildPost();
+const titleTa=mkTa("TikTokのタイトル","s");
+(function(){
+  const card=document.createElement("div");card.className="blk";
+  const h=document.createElement("h2");
+  h.innerHTML='<span class="ttl">タイトル</span><span class="hb"><button class="sub cp" type="button">コピー</button></span>';
+  const btn=h.querySelector(".cp");
+  btn.onclick=async()=>{
+    const t=titleTa.value;if(!t)return;
+    let ok=false;
+    try{await navigator.clipboard.writeText(t);ok=true}
+    catch(e){titleTa.select();try{ok=document.execCommand("copy")}catch(_){}}
+    btn.textContent=ok?"コピーしました":"コピーできません";
+    setTimeout(()=>{btn.textContent="コピー"},1300);
+  };
+  titleTa.style.marginBottom="0";
+  card.append(h,titleTa);
+  $("ttlbox").appendChild(card);
+})();
 const cb=fileBtn("コメント画像をまとめて選択",true,"image/*",async fl=>{
   for(let i=0;i<fl.length;i++){while(sets.length<=i)addSet();await sets[i].setImg(fl[i])}
   cb.reset();
@@ -254,6 +282,7 @@ async function restore(){
   let d=null;
   try{d=await idbGet("state")}catch(e){}
   if(d&&d.post){
+    titleTa.value=d.title||"";
     $("spd").value=d.spd||1;$("gap").value=d.gap||0.4;
     post.ta.value=d.post.ta||"";post.rd.value=d.post.rd||"";
     if(d.post.imgs&&d.post.imgs.length)await post.setImgs(d.post.imgs);
@@ -281,7 +310,7 @@ $("go").onclick=async()=>{
   const lab=s=>s===post?"ポスト本文":s.fixed?"固定文":"コメント"+(sets.indexOf(s)+1);
   for(const s of all){
     if(s.fixed)continue;
-    s.lines=s.ta.value.replace(/\r/g,"").split("\n").map(x=>x.trim()).filter(Boolean);
+    s.lines=s.ta.value.replace(/\r/g,"").split("\n").map(x=>x.trim().replace(/／/g,"/")).filter(Boolean);
     if(s===post){
       if(!post.imgs.length)return st.textContent="ポスト本文の画像がありません";
       if(!s.lines.length)return st.textContent="ポスト本文の字幕がありません";
@@ -309,7 +338,7 @@ $("go").onclick=async()=>{
     const spd=Math.min(2,Math.max(0.5,parseFloat($("spd").value)||1));
     let acc=0;
     for(const s of all){
-      const text=(s.fixedText||(s.rd.value.trim()||s.lines.join(""))).replace(/\//g,"");
+      const text=(s.fixedText||(s.rd.value.trim()||s.lines.join(""))).replace(/[\/／]/g,"");
       const key=s.file?("f:"+s.file.name+s.file.size):(SPK+"|"+text);
       if(s.key!==key||!s.raw){
         let ab;
