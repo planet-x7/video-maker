@@ -38,6 +38,8 @@ h1{text-align:center;font-size:19px;font-weight:700;letter-spacing:.04em;margin:
 #out .go{margin-top:8px}
 .hint{font-size:12px;color:#8e8e93;text-align:center}
 #cimgs .btn{background:#fff;margin:0 0 14px}
+.adv{margin:0 4px 16px;color:#8e8e93;font-size:13px}
+.adv summary{padding:4px 0}
 .wipe{display:block;margin:26px auto 0;border:0;background:transparent;color:#a0a0a8;font-size:12px;text-decoration:underline}
 </style>
 </head>
@@ -49,6 +51,7 @@ h1{text-align:center;font-size:19px;font-weight:700;letter-spacing:.04em;margin:
 <div id="sets"></div>
 <button class="add" id="add">＋ コメントを追加</button>
 <div class="opt"><span>話者 : 四国めたん</span><span>速度 <input type="number" id="spd" value="1" step="0.05" min="0.5" max="2"></span><span>間隔 <input type="number" id="gap" value="0.4" step="0.1" min="0"> 秒</span></div>
+<details class="adv"><summary>調整</summary><div class="opt" style="margin-top:8px"><span>字幕を早める <input type="number" id="sync" value="0.25" step="0.05" min="-1" max="2"> 秒</span><span>終わりの余白 <input type="number" id="tail" value="2.5" step="0.5" min="0" max="10"> 秒</span></div></details>
 <button class="go" id="go">動画を作る</button>
 <p id="st"></p>
 <canvas id="cv" width="1080" height="1920"></canvas>
@@ -58,7 +61,8 @@ h1{text-align:center;font-size:19px;font-weight:700;letter-spacing:.04em;margin:
 
 <script>
 const W=1080,H=1920,BG="#EAFAFF";
-const CAP_C=Math.round(H*0.285-110*1.3),IMG_TOP=Math.round(H*0.315),TAIL=3.5;
+const CAP_C=Math.round(H*0.285-110*1.3),IMG_TOP=Math.round(H*0.315);
+let FR=0;
 const cv=document.getElementById("cv"),ctx=cv.getContext("2d");
 const $=id=>document.getElementById(id);
 const sets=[];
@@ -100,6 +104,7 @@ function drawFrame(img,text,fy,one){
     const w=img.naturalWidth*r,h=img.naturalHeight*r;
     ctx.drawImage(img,W/2-w/2,IMG_TOP,w,h);
   }
+  ctx.fillStyle=(FR++&1)?"#EAFAFF":"#E9FAFF";ctx.fillRect(0,H-6,6,6);
 }
 
 function fileBtn(label,multi,accept,onpick){
@@ -137,7 +142,7 @@ const dbp=new Promise((res,rej)=>{const r=indexedDB.open("momijix",1);r.onupgrad
 async function idbGet(k){const db=await dbp;return new Promise((res,rej)=>{const q=db.transaction("kv").objectStore("kv").get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
 async function idbSet(k,v){const db=await dbp;return new Promise((res,rej)=>{const t=db.transaction("kv","readwrite");t.objectStore("kv").put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error)})}
 async function doSave(){
-  try{await idbSet("state",{title:titleTa.value,spd:$("spd").value,gap:$("gap").value,
+  try{await idbSet("state",{title:titleTa.value,spd:$("spd").value,gap:$("gap").value,sync:$("sync").value,tail:$("tail").value,
     post:{ta:post.ta.value,rd:post.rd.value,imgs:post.imgs.map(o=>o.file),file:post.file},
     sets:sets.map(s=>({ta:s.ta.value,rd:s.rd.value,img:s.imgFile,file:s.file}))})}catch(e){}
 }
@@ -292,6 +297,7 @@ async function restore(){
   if(d&&d.post){
     titleTa.value=d.title||"";
     $("spd").value=d.spd||1;$("gap").value=d.gap||0.4;
+    if(d.sync!=null)$("sync").value=d.sync;if(d.tail!=null)$("tail").value=d.tail;
     post.ta.value=d.post.ta||"";post.rd.value=d.post.rd||"";
     if(d.post.imgs&&d.post.imgs.length)await post.setImgs(d.post.imgs);
     if(d.post.file)post.setAudio(d.post.file);
@@ -340,6 +346,8 @@ $("go").onclick=async()=>{
     st.textContent="音声を読み込み中…";
     const gap=Math.max(0,parseFloat($("gap").value)||0);
     const spd=Math.min(2,Math.max(0.5,parseFloat($("spd").value)||1));
+    const num=(id,d)=>{const v=parseFloat($(id).value);return isNaN(v)?d:v};
+    const SYNC=num("sync",0.25),TAIL=Math.max(0,num("tail",2.5));
     let acc=0;
     for(const s of all){
       const text=(s.fixedText||(s.rd.value.trim()||s.lines.join(""))).replace(/[\/／]/g,"");
@@ -379,7 +387,7 @@ $("go").onclick=async()=>{
     await new Promise(res=>{
       (function loop(){
         const t=ac.currentTime-startAt;
-        drawFrame(...frameAt(Math.max(t,0)));
+        drawFrame(...frameAt(Math.max(t+SYNC,0)));
         st.textContent="作成中… "+Math.max(0,Math.round(t))+" / "+Math.round(total)+" 秒";
         if(t>=total+TAIL)return res();
         requestAnimationFrame(loop);
@@ -402,6 +410,8 @@ $("go").onclick=async()=>{
     };
     $("out").appendChild(b);
     st.textContent="完成!";
+    const vv=$("out").querySelector("video"),expect=total+TAIL+0.15;
+    vv.onloadedmetadata=()=>{if(isFinite(vv.duration))st.textContent="完成!(動画 "+vv.duration.toFixed(1)+"秒 / 予定 "+expect.toFixed(1)+"秒)"};
     const names=[...new Set(all.map(x=>x.spName).filter(Boolean))];
     $("credit").textContent=names.length?"クレジット: "+names.join(" / "):"";
   }catch(e){st.textContent="エラー: "+(e&&e.message||e)}
