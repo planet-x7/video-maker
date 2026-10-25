@@ -104,7 +104,7 @@ function drawFrame(img,text,fy,one){
   const lh=fs*1.3;
   lines.forEach((l,i)=>ctx.fillText(l,W/2,CAP_C+(i-(lines.length-1)/2)*lh));
   if(img){
-    const r=Math.min(W/img.naturalWidth,(H*0.9-IMG_TOP)/img.naturalHeight);
+    const r=Math.min(W*(img.__post?0.935:1)/img.naturalWidth,(H*0.9-IMG_TOP)/img.naturalHeight);
     const w=img.naturalWidth*r,h=img.naturalHeight*r;
     ctx.drawImage(img,W/2-w/2,IMG_TOP,w,h);
   }
@@ -201,7 +201,7 @@ function buildPost(){
   s.audBtn=fileBtn("音声ファイルを選択",false,"",fl=>s.setAudio(fl[0]||null));
   s.setImgs=async fl=>{
     s.imgs=[];
-    for(const f of fl){const o=await loadImg(f);o.file=f;s.imgs.push(o)}
+    for(const f of fl){const o=await loadImg(f);o.file=f;o.el.__post=true;s.imgs.push(o)}
     render();s.imgBtn.set(fl.length?"✓ "+fl.length+"枚":"画像を選択");save();
   };
   s.setAudio=f=>{s.file=f;s.audBtn.set(f?"✓ "+f.name.slice(0,18):"音声ファイルを選択");save()};
