@@ -91,7 +91,11 @@ function wrap(t,max){
   }
   return lines;
 }
+let LI=null,LT=null,LO=null;
+function pix(){ctx.fillStyle=(FR++&1)?"#EAFAFF":"#E9FAFF";ctx.fillRect(0,H-6,6,6)}
 function drawFrame(img,text,fy,one){
+  if(img===LI&&text===LT&&one===LO){pix();return}
+  LI=img;LT=text;LO=one;
   drawBase();
   ctx.fillStyle="#000";ctx.textAlign="center";ctx.textBaseline="middle";
   let fs=110,lines;
@@ -104,7 +108,7 @@ function drawFrame(img,text,fy,one){
     const w=img.naturalWidth*r,h=img.naturalHeight*r;
     ctx.drawImage(img,W/2-w/2,IMG_TOP,w,h);
   }
-  ctx.fillStyle=(FR++&1)?"#EAFAFF":"#E9FAFF";ctx.fillRect(0,H-6,6,6);
+  pix();
 }
 
 function fileBtn(label,multi,accept,onpick){
@@ -375,7 +379,7 @@ $("go").onclick=async()=>{
     const stream=cv.captureStream(30);
     dest.stream.getAudioTracks().forEach(t=>stream.addTrack(t));
     const mime=["video/mp4;codecs=avc1","video/mp4","video/webm;codecs=vp9,opus","video/webm"].find(m=>window.MediaRecorder&&MediaRecorder.isTypeSupported(m))||"";
-    const rec=new MediaRecorder(stream,mime?{mimeType:mime,videoBitsPerSecond:6000000}:{});
+    const rec=new MediaRecorder(stream,mime?{mimeType:mime,videoBitsPerSecond:6000000,audioBitsPerSecond:128000}:{});
     const chunks=[];rec.ondataavailable=e=>e.data.size&&chunks.push(e.data);
     const done=new Promise(r=>rec.onstop=r);
     const nb=ac.createBuffer(1,ac.sampleRate*2,ac.sampleRate),nd=nb.getChannelData(0);
