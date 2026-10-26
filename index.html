@@ -40,6 +40,12 @@ h1{text-align:center;font-size:19px;font-weight:700;letter-spacing:.04em;margin:
 #cimgs .btn{background:#fff;margin:0 0 14px}
 .adv{margin:0 4px 16px;color:#8e8e93;font-size:13px}
 .adv summary{padding:4px 0}
+.cut{display:none;margin:0 0 10px}
+.cut.on{display:block}
+.cut canvas{width:100%;display:block;margin:8px 0;border-radius:12px;background:#fff;border:1px solid #e0e0e4}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 0}
+.chips .sub.on{background:#111;color:#fff}
+.note{font-size:12px;color:#8e8e93;margin:6px 0}
 .wipe{display:block;margin:26px auto 0;border:0;background:transparent;color:#a0a0a8;font-size:12px;text-decoration:underline}
 </style>
 </head>
@@ -137,6 +143,23 @@ function mkTa(ph,cls){const t=document.createElement("textarea");t.className="ta
 async function loadImg(f){
   const url=URL.createObjectURL(f),el=new Image();el.src=url;
   try{await el.decode()}catch(_){}
+  if(!/jpe?g/i.test(f.type||"")){
+    try{
+      const k=Math.min(1,256/Math.max(el.naturalWidth,el.naturalHeight));
+      const t=document.createElement("canvas");t.width=Math.max(1,Math.round(el.naturalWidth*k));t.height=Math.max(1,Math.round(el.naturalHeight*k));
+      const tx=t.getContext("2d");tx.drawImage(el,0,0,t.width,t.height);
+      const d=tx.getImageData(0,0,t.width,t.height).data;
+      let tr=false;for(let n=3;n<d.length;n+=4){if(d[n]<250){tr=true;break}}
+      if(tr){
+        const c=document.createElement("canvas");c.width=el.naturalWidth;c.height=el.naturalHeight;
+        const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(el,0,0);
+        const blob=await new Promise(r=>c.toBlob(r,"image/png"));
+        const u2=URL.createObjectURL(blob),e2=new Image();e2.src=u2;
+        try{await e2.decode()}catch(_){}
+        return {url:u2,el:e2};
+      }
+    }catch(e){}
+  }
   return {url,el};
 }
 
@@ -156,7 +179,7 @@ function addSet(){
   const s={img:null,imgFile:null,file:null};
   const card=document.createElement("div");card.className="blk";
   const h=document.createElement("h2");
-  h.innerHTML='<span class="ttl"></span><span class="hb"><button class="sub sl" type="button">／</button><button class="sub del" type="button">削除</button></span>';
+  h.innerHTML='<span class="ttl"></span><span class="hb"><button class="sub up" type="button">↑</button><button class="sub dn" type="button">↓</button><button class="sub sl" type="button">／</button><button class="sub del" type="button">削除</button></span>';
   const pv=document.createElement("img");pv.className="pv";
   s.ta=mkTa("字幕(改行で字幕を切り替え。／で字幕の中で改行)");s.rd=mkTa("読み上げ修正","s");s.card=card;
   s.imgBtn=fileBtn("画像を選択",false,"image/*",fl=>{if(fl[0])s.setImg(fl[0])});
@@ -173,6 +196,8 @@ function addSet(){
   };
   card.append(h,s.imgBtn,pv,s.ta,s.rd,s.audBtn);
   h.querySelector(".sl").onclick=()=>insSlash(s.ta);
+  h.querySelector(".up").onclick=()=>moveSet(s,-1);
+  h.querySelector(".dn").onclick=()=>moveSet(s,1);
   h.querySelector(".del").onclick=()=>{
     if(sets.length<2){s.clear();return}
     sets.splice(sets.indexOf(s),1);card.remove();renum();save();
@@ -180,7 +205,116 @@ function addSet(){
   sets.push(s);$("sets").appendChild(card);renum();
   return s;
 }
+function moveSet(s,d){
+  const i=sets.indexOf(s),j=i+d;
+  if(j<0||j>=sets.length)return;
+  [sets[i],sets[j]]=[sets[j],sets[i]];
+  sets.forEach(x=>$("sets").appendChild(x.card));
+  renum();save();
+  s.card.scrollIntoView({block:"center",behavior:"smooth"});
+}
 const post={imgs:[],file:null,isPost:true,gapAfter:0.2};
+function buildCut(s){
+  const btn=document.createElement("button");btn.type="button";btn.className="btn";btn.textContent="スクショを区切る";
+  const panel=document.createElement("div");panel.className="cut";
+  const shot={img:null,w:0,h:0,taps:[],footer:0,bands:[],d:null,mode:"cut"};
+  const sc=document.createElement("canvas"),sx=sc.getContext("2d");
+  const note=document.createElement("div");note.className="note";
+  const chips=document.createElement("div");chips.className="chips";
+  const mk=(t,fn)=>{const b=document.createElement("button");b.type="button";b.className="sub";b.textContent=t;b.onclick=fn;chips.appendChild(b);return b};
+  const setMode=m=>{shot.mode=m;bCut.classList.toggle("on",m==="cut");bFoot.classList.toggle("on",m==="foot")};
+  const bCut=mk("区切り位置",()=>setMode("cut")),bFoot=mk("下の情報の位置",()=>setMode("foot"));
+  mk("1つ戻す",()=>{shot.taps.pop();redraw()});
+  mk("全部消す",()=>{shot.taps=[];redraw()});
+  const mkb=document.createElement("button");mkb.type="button";mkb.className="btn";mkb.style.cssText="background:#111;color:#fff;margin:8px 0 0";mkb.textContent="画像を作る";
+  const isInk=(i)=>shot.d[i]+shot.d[i+1]+shot.d[i+2]<600;
+  function analyze(){
+    const c=document.createElement("canvas");c.width=shot.w;c.height=shot.h;
+    const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(shot.img,0,0,shot.w,shot.h);
+    shot.d=x.getImageData(0,0,shot.w,shot.h).data;
+    const ink=new Uint8Array(shot.h);
+    for(let y=0;y<shot.h;y++){for(let xx=0;xx<shot.w;xx++){if(isInk((y*shot.w+xx)*4)){ink[y]=1;break}}}
+    const bands=[];let top=-1,last=-1;
+    for(let y=0;y<shot.h;y++){
+      if(ink[y]){if(top<0)top=y;last=y}
+      else if(top>=0&&y-last>3){bands.push({top,bottom:last});top=-1}
+    }
+    if(top>=0)bands.push({top,bottom:last});
+    shot.bands=bands;
+    shot.footer=bands.length>=3?Math.max(0,bands[bands.length-2].top-8):Math.round(shot.h*0.7);
+    shot.taps=[];
+  }
+  function bandAt(y){
+    let b=shot.bands[0],bd=1e9;
+    for(const q of shot.bands){const dd=y<q.top?q.top-y:(y>q.bottom?y-q.bottom:0);if(dd<bd){bd=dd;b=q}}
+    return b;
+  }
+  function colInk(band,xx){for(let y=band.top;y<=band.bottom;y++){if(isInk((y*shot.w+xx)*4))return true}return false}
+  function snapX(band,x){
+    x=Math.max(0,Math.min(shot.w-1,Math.round(x)));
+    if(!colInk(band,x))return x;
+    for(let d=1;d<=60;d++){
+      if(x-d>=0&&!colInk(band,x-d))return x-d;
+      if(x+d<shot.w&&!colInk(band,x+d))return x+d;
+    }
+    return x;
+  }
+  function pt(t){const b=bandAt(t.y);return {band:b,x:snapX(b,t.x),top:Math.max(0,b.top-2),bottom:Math.min(shot.h-1,b.bottom+2)}}
+  function redraw(){
+    if(!shot.img)return;
+    sc.width=shot.w;sc.height=shot.h;
+    sx.drawImage(shot.img,0,0,shot.w,shot.h);
+    sx.lineWidth=Math.max(3,shot.w/300);
+    sx.strokeStyle="#1a8cff";sx.setLineDash([14,10]);
+    sx.beginPath();sx.moveTo(0,shot.footer);sx.lineTo(shot.w,shot.footer);sx.stroke();
+    sx.setLineDash([]);sx.strokeStyle="#ff3b30";sx.fillStyle="#ff3b30";
+    shot.taps=shot.taps.slice().sort((a,b)=>bandAt(a.y).top-bandAt(b.y).top||a.x-b.x);
+    shot.taps.forEach((t,i)=>{
+      const p=pt(t);
+      sx.beginPath();sx.moveTo(p.x,p.top);sx.lineTo(p.x,p.bottom);sx.stroke();
+      const r=Math.max(14,shot.w/45);
+      sx.beginPath();sx.arc(p.x,p.top,r,0,7);sx.fill();
+      sx.fillStyle="#fff";sx.font="bold "+Math.round(r*1.3)+"px sans-serif";sx.textAlign="center";sx.textBaseline="middle";
+      sx.fillText(String(i+1),p.x,p.top);sx.fillStyle="#ff3b30";
+    });
+    const n=shot.taps.length+1;
+    note.textContent="見せたい文字の最後の右側をタップ。最後の1枚は全文です。いま画像"+n+"枚 → 字幕も"+n+"行にしてください。青い点線から下は、どの画像にも残る部分です。";
+  }
+  sc.onclick=ev=>{
+    if(!shot.img)return;
+    const r=sc.getBoundingClientRect();
+    const x=(ev.clientX-r.left)*sc.width/r.width,y=(ev.clientY-r.top)*sc.height/r.height;
+    if(shot.mode==="foot")shot.footer=Math.round(y);else shot.taps.push({x,y});
+    redraw();
+  };
+  const pick=fileBtn("スクショを選択",false,"image/*",async fl=>{
+    if(!fl[0])return;
+    const o=await loadImg(fl[0]);
+    shot.img=o.el;shot.w=o.el.naturalWidth;shot.h=o.el.naturalHeight;
+    analyze();setMode("cut");redraw();
+  });
+  mkb.onclick=async()=>{
+    if(!shot.img)return;
+    const pts=shot.taps.map(pt),files=[];
+    for(let i=0;i<=pts.length;i++){
+      const c=document.createElement("canvas");c.width=shot.w;c.height=shot.h;
+      const x=c.getContext("2d");x.drawImage(shot.img,0,0,shot.w,shot.h);
+      if(i<pts.length){
+        const p=pts[i];x.fillStyle="#fff";
+        x.fillRect(p.x,p.top,shot.w-p.x,p.bottom-p.top+1);
+        x.fillRect(0,p.bottom+1,shot.w,Math.max(0,shot.footer-p.bottom-1));
+      }
+      const blob=await new Promise(r=>c.toBlob(r,"image/png"));
+      files.push(new File([blob],"post-"+(i+1)+".png",{type:"image/png"}));
+    }
+    await s.setImgs(files);
+    panel.classList.remove("on");
+  };
+  btn.onclick=()=>panel.classList.toggle("on");
+  panel.append(pick,sc,chips,note,mkb);
+  setMode("cut");
+  return {btn,panel};
+}
 function buildPost(){
   const s=post;
   const card=document.createElement("div");card.className="blk";
@@ -209,7 +343,8 @@ function buildPost(){
   h.querySelector(".del").onclick=()=>{
     s.imgs=[];s.file=null;s.ta.value="";s.rd.value="";render();s.imgBtn.reset();s.audBtn.reset();save();
   };
-  card.append(h,s.imgBtn,th,s.ta,s.rd,s.audBtn);
+  const cut=buildCut(s);
+  card.append(h,s.imgBtn,cut.btn,cut.panel,th,s.ta,s.rd,s.audBtn);
   $("post").appendChild(card);
 }
 buildPost();
