@@ -7,10 +7,11 @@
 <style>
 :root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}
-body{margin:0 auto;padding:22px 16px 40px;max-width:520px;background:#f2f2f4;color:#111;font-family:-apple-system,"Hiragino Sans",sans-serif;counter-reset:n}
+body{margin:0 auto;padding:22px 16px 40px;max-width:520px;background:#fff;color:#111;font-family:-apple-system,"Hiragino Sans",sans-serif;counter-reset:n}
 h1{text-align:center;font-size:19px;font-weight:700;letter-spacing:.04em;margin:6px 0 22px}
-.blk{counter-increment:n;background:#fff;border-radius:28px;padding:20px;margin-bottom:14px}
-.blk h2{display:flex;justify-content:space-between;align-items:center;margin:0 0 12px;font-size:14px;font-weight:600;color:#8e8e93}
+.blk{counter-increment:n;padding:22px 0;border-top:1px solid #efeff2}
+#ttlbox .blk{border-top:0;padding-top:4px}
+.blk h2{display:flex;justify-content:space-between;align-items:center;margin:0 0 14px;font-size:12px;font-weight:600;letter-spacing:.1em;color:#8e8e93}
 .blk h2::before{content:"0" counter(n);color:#c2c2c8;letter-spacing:.1em;margin-right:10px}
 .blk h2 .ttl{flex:1}
 #post .blk,#ttlbox .blk{counter-increment:none}
@@ -27,7 +28,7 @@ h1{text-align:center;font-size:19px;font-weight:700;letter-spacing:.04em;margin:
 .th{flex:none;width:56px;text-align:center;font-size:11px;color:#8e8e93}
 .th img{width:56px;height:56px;object-fit:contain;background:#fff;border-radius:10px;border:1px solid #e0e0e4}
 .th button{display:block;width:100%;border:0;background:#f2f2f4;border-radius:99px;font-size:11px;margin-top:3px;padding:2px 0}
-.add{display:block;width:100%;background:transparent;border:2px dashed #c9c9d0;color:#8e8e93;border-radius:99px;padding:12px;font-size:15px;margin-bottom:18px}
+.add{display:block;width:100%;background:transparent;border:0;border-top:1px solid #efeff2;color:#8e8e93;padding:20px 0 22px;font-size:15px;margin-bottom:6px}
 .opt{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;color:#8e8e93;margin:0 4px 18px;flex-wrap:wrap}
 .opt input{width:56px;font-size:15px;text-align:center;border:0;background:#fff;color:#111;border-radius:99px;padding:6px}
 .go{display:block;width:100%;border:0;background:#111;color:#fff;border-radius:99px;padding:16px;font-size:16px;font-weight:700}
@@ -37,7 +38,8 @@ h1{text-align:center;font-size:19px;font-weight:700;letter-spacing:.04em;margin:
 #out video{display:block;width:70%;margin:12px auto;border-radius:16px}
 #out .go{margin-top:8px}
 .hint{font-size:12px;color:#8e8e93;text-align:center}
-#cimgs .btn{background:#fff;margin:0 0 14px}
+#cimgs{border-top:1px solid #efeff2;padding-top:20px}
+#cimgs .btn{margin:0 0 6px}
 .adv{margin:0 4px 16px;color:#8e8e93;font-size:13px}
 .adv summary{padding:4px 0}
 .cut{display:none;margin:0 0 10px}
@@ -46,6 +48,10 @@ h1{text-align:center;font-size:19px;font-weight:700;letter-spacing:.04em;margin:
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 0}
 .chips .sub.on{background:#111;color:#fff}
 .note{font-size:12px;color:#8e8e93;margin:6px 0}
+#sets .blk:first-child{border-top:0;padding-top:8px}
+.mini{display:flex;gap:6px;margin:0 0 10px}
+.mini .sub.on{background:#111;color:#fff}
+.hide{display:none!important}
 .wipe{display:block;margin:26px auto 0;border:0;background:transparent;color:#a0a0a8;font-size:12px;text-decoration:underline}
 </style>
 </head>
@@ -56,7 +62,7 @@ h1{text-align:center;font-size:19px;font-weight:700;letter-spacing:.04em;margin:
 <div id="cimgs"></div>
 <div id="sets"></div>
 <button class="add" id="add">＋ コメントを追加</button>
-<div class="opt"><span>話者 : 四国めたん</span><span>速度 <input type="number" id="spd" value="1" step="0.05" min="0.5" max="2"></span><span>間隔 <input type="number" id="gap" value="0.4" step="0.1" min="0"> 秒</span></div>
+<div class="opt" style="justify-content:center;gap:36px"><span>速度 <input type="number" id="spd" value="1" step="0.05" min="0.5" max="2"></span><span>間隔 <input type="number" id="gap" value="0.4" step="0.1" min="0"> 秒</span></div>
 <details class="adv"><summary>調整</summary><div class="opt" style="margin-top:8px"><span>字幕を早める <input type="number" id="sync" value="0" step="0.05" min="-1" max="2"> 秒</span><span>終わりの余白 <input type="number" id="tail" value="1.5" step="0.5" min="0" max="10"> 秒</span></div></details>
 <button class="go" id="go">動画を作る</button>
 <p id="st"></p>
@@ -175,6 +181,19 @@ async function doSave(){
 }
 document.addEventListener("input",save);
 
+function mkMini(s){
+  const d=document.createElement("div");d.className="mini";
+  const mkc=t=>{const b=document.createElement("button");b.type="button";b.className="sub";b.textContent=t;d.appendChild(b);return b};
+  const b1=mkc("読み上げ修正"),b2=mkc("音声ファイル");
+  const set1=v=>{s.rd.classList.toggle("hide",!v);b1.classList.toggle("on",v)};
+  const set2=v=>{s.audBtn.classList.toggle("hide",!v);b2.classList.toggle("on",v)};
+  b1.onclick=()=>{const v=s.rd.classList.contains("hide");set1(v);if(v)s.rd.focus()};
+  b2.onclick=()=>set2(s.audBtn.classList.contains("hide"));
+  s.reveal=()=>{if(s.rd.value.trim())set1(true);if(s.file)set2(true)};
+  s.hideAll=()=>{set1(false);set2(false)};
+  s.hideAll();
+  return d;
+}
 function addSet(){
   const s={img:null,imgFile:null,file:null};
   const card=document.createElement("div");card.className="blk";
@@ -189,12 +208,13 @@ function addSet(){
     s.img=o.el;s.imgFile=f;pv.src=o.url;pv.style.display="block";
     s.imgBtn.set("✓ "+(f.name||"画像").slice(0,18));save();
   };
-  s.setAudio=f=>{s.file=f;s.audBtn.set(f?"✓ "+f.name.slice(0,18):"音声ファイルを選択");save()};
+  s.setAudio=f=>{s.file=f;s.audBtn.set(f?"✓ "+f.name.slice(0,18):"音声ファイルを選択");if(f&&s.reveal)s.reveal();save()};
   s.clear=()=>{
     s.img=null;s.imgFile=null;s.file=null;pv.style.display="none";
-    s.ta.value="";s.rd.value="";s.imgBtn.reset();s.audBtn.reset();save();
+    s.ta.value="";s.rd.value="";s.imgBtn.reset();s.audBtn.reset();s.hideAll();save();
   };
-  card.append(h,s.imgBtn,pv,s.ta,s.rd,s.audBtn);
+  const mini=mkMini(s);
+  card.append(h,s.imgBtn,pv,s.ta,mini,s.rd,s.audBtn);
   h.querySelector(".sl").onclick=()=>insSlash(s.ta);
   h.querySelector(".up").onclick=()=>moveSet(s,-1);
   h.querySelector(".dn").onclick=()=>moveSet(s,1);
@@ -215,7 +235,6 @@ function moveSet(s,d){
 }
 const post={imgs:[],file:null,isPost:true,gapAfter:0.2};
 function buildCut(s){
-  const btn=document.createElement("button");btn.type="button";btn.className="btn";btn.textContent="スクショを区切る";
   const panel=document.createElement("div");panel.className="cut";
   const shot={img:null,w:0,h:0,taps:[],footer:0,bands:[],d:null,mode:"cut"};
   const sc=document.createElement("canvas"),sx=sc.getContext("2d");
@@ -278,7 +297,7 @@ function buildCut(s){
       sx.fillText(String(i+1),p.x,p.top);sx.fillStyle="#ff3b30";
     });
     const n=shot.taps.length+1;
-    note.textContent="見せたい文字の最後の右側をタップ。最後の1枚は全文です。いま画像"+n+"枚 → 字幕も"+n+"行にしてください。青い点線から下は、どの画像にも残る部分です。";
+    note.textContent="区切りたい所(見せたい文字の最後の右側)をタップ。最後の1枚は全文です。区切らない時は、何もしなくて大丈夫です。いま画像"+n+"枚 → 字幕も"+n+"行。青い点線から下は、全部の画像に残ります。";
   }
   sc.onclick=ev=>{
     if(!shot.img)return;
@@ -287,12 +306,12 @@ function buildCut(s){
     if(shot.mode==="foot")shot.footer=Math.round(y);else shot.taps.push({x,y});
     redraw();
   };
-  const pick=fileBtn("スクショを選択",false,"image/*",async fl=>{
-    if(!fl[0])return;
-    const o=await loadImg(fl[0]);
+  async function load(f){
+    if(!f){panel.classList.remove("on");return}
+    const o=await loadImg(f);
     shot.img=o.el;shot.w=o.el.naturalWidth;shot.h=o.el.naturalHeight;
-    analyze();setMode("cut");redraw();
-  });
+    analyze();setMode("cut");redraw();panel.classList.add("on");
+  }
   mkb.onclick=async()=>{
     if(!shot.img)return;
     const pts=shot.taps.map(pt),files=[];
@@ -310,10 +329,9 @@ function buildCut(s){
     await s.setImgs(files);
     panel.classList.remove("on");
   };
-  btn.onclick=()=>panel.classList.toggle("on");
-  panel.append(pick,sc,chips,note,mkb);
+  panel.append(sc,chips,note,mkb);
   setMode("cut");
-  return {btn,panel};
+  return {panel,load};
 }
 function buildPost(){
   const s=post;
@@ -331,20 +349,21 @@ function buildPost(){
     });
   };
   s.ta=mkTa("字幕(1行 = 画像1枚。／で字幕の中で改行)");s.rd=mkTa("読み上げ修正","s");s.card=card;
-  s.imgBtn=fileBtn("画像を選択",true,"image/*",fl=>s.setImgs(fl));
+  const cut=buildCut(s);
+  s.imgBtn=fileBtn("画像を選択",true,"image/*",fl=>{s.setImgs(fl);cut.load(fl.length===1?fl[0]:null)});
   s.audBtn=fileBtn("音声ファイルを選択",false,"",fl=>s.setAudio(fl[0]||null));
   s.setImgs=async fl=>{
     s.imgs=[];
     for(const f of fl){const o=await loadImg(f);o.file=f;o.el.__post=true;s.imgs.push(o)}
     render();s.imgBtn.set(fl.length?"✓ "+fl.length+"枚":"画像を選択");save();
   };
-  s.setAudio=f=>{s.file=f;s.audBtn.set(f?"✓ "+f.name.slice(0,18):"音声ファイルを選択");save()};
+  s.setAudio=f=>{s.file=f;s.audBtn.set(f?"✓ "+f.name.slice(0,18):"音声ファイルを選択");if(f&&s.reveal)s.reveal();save()};
   h.querySelector(".sl").onclick=()=>insSlash(s.ta);
   h.querySelector(".del").onclick=()=>{
-    s.imgs=[];s.file=null;s.ta.value="";s.rd.value="";render();s.imgBtn.reset();s.audBtn.reset();save();
+    s.imgs=[];s.file=null;s.ta.value="";s.rd.value="";render();s.imgBtn.reset();s.audBtn.reset();s.hideAll();cut.load(null);save();
   };
-  const cut=buildCut(s);
-  card.append(h,s.imgBtn,cut.btn,cut.panel,th,s.ta,s.rd,s.audBtn);
+  const mini=mkMini(s);
+  card.append(h,s.imgBtn,cut.panel,th,s.ta,mini,s.rd,s.audBtn);
   $("post").appendChild(card);
 }
 buildPost();
@@ -440,10 +459,12 @@ async function restore(){
     post.ta.value=d.post.ta||"";post.rd.value=d.post.rd||"";
     if(d.post.imgs&&d.post.imgs.length)await post.setImgs(d.post.imgs);
     if(d.post.file)post.setAudio(d.post.file);
+    post.reveal();
     for(const x of (d.sets&&d.sets.length?d.sets:[{}])){
       const s=addSet();s.ta.value=x.ta||"";s.rd.value=x.rd||"";
       if(x.img)await s.setImg(x.img);
       if(x.file)s.setAudio(x.file);
+      s.reveal();
     }
   }else addSet();
   ready=true;
