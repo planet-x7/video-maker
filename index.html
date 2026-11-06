@@ -3,60 +3,67 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Momiji_X</title>
+<title>Mars</title>
+<meta name="apple-mobile-web-app-title" content="Mars">
 <style>
 :root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}
-body{margin:0 auto;padding:22px 16px 40px;max-width:520px;background:#fff;color:#111;font-family:-apple-system,"Hiragino Sans",sans-serif;counter-reset:n}
-h1{text-align:center;font-size:19px;font-weight:700;letter-spacing:.04em;margin:6px 0 22px}
-.blk{counter-increment:n;padding:22px 0;border-top:1px solid #efeff2}
+body{margin:0 auto;padding:0 0 40px;max-width:520px;background:#fff;color:#111;font-family:-apple-system,"Hiragino Sans",sans-serif;counter-reset:n}
+h1{text-align:center;font-size:20px;font-weight:700;letter-spacing:.16em;margin:18px 0 22px}
+.blk{counter-increment:n;padding:22px 20px;border-top:1px solid #ececf0}
 #ttlbox .blk{border-top:0;padding-top:4px}
-.blk h2{display:flex;justify-content:space-between;align-items:center;margin:0 0 14px;font-size:12px;font-weight:600;letter-spacing:.1em;color:#8e8e93}
+#sets .blk:first-child{border-top:0;padding-top:8px}
+.blk h2{display:flex;justify-content:space-between;align-items:center;margin:0 0 8px;font-size:12px;font-weight:600;letter-spacing:.1em;color:#8e8e93}
 .blk h2::before{content:"0" counter(n);color:#c2c2c8;letter-spacing:.1em;margin-right:10px}
 .blk h2 .ttl{flex:1}
 #post .blk,#ttlbox .blk{counter-increment:none}
 #post .blk h2::before,#ttlbox .blk h2::before{content:none}
-.hb{display:flex;gap:6px}
-.btn{display:block;width:100%;border:0;background:#f2f2f4;color:#111;border-radius:99px;padding:12px;font-size:15px;margin-bottom:10px}
-.blk>div:last-child .btn{margin-bottom:0}
-.sub{border:0;background:#f2f2f4;color:#8e8e93;border-radius:99px;padding:5px 12px;font-size:12px}
-.ta{display:block;width:100%;min-height:76px;border:0;background:#f6f6f8;color:#111;border-radius:14px;padding:12px;font-size:16px;margin-bottom:10px;font-family:inherit;resize:none}
+.hb{display:flex;gap:2px}
+.sub{border:0;background:none;color:#8e8e93;padding:6px 8px;font-size:13px;font-family:inherit}
+.fb .btn{display:flex;justify-content:space-between;align-items:center;width:100%;margin:0;background:none;border:0;border-bottom:1px solid #ececf0;border-radius:0;padding:15px 0;font-size:16px;font-weight:400;color:#111;text-align:left}
+.fb .btn::after{content:"›";color:#c4c4c9;font-size:22px;line-height:1}
+.btn{display:block;width:100%;margin-top:10px;border:0;border-radius:99px;background:#111;color:#fff;padding:13px;font-size:15px;font-weight:600;font-family:inherit}
+.ta{display:block;width:100%;min-height:64px;border:0;border-bottom:1px solid #e3e3e8;border-radius:0;background:transparent;color:#111;padding:12px 0;font-size:17px;margin:0 0 6px;font-family:inherit;resize:none;outline:0}
+.ta:focus{border-bottom-color:#111}
 .ta.s{min-height:44px}
-.ta::placeholder{color:#a0a0a8}
-.pv{display:none;width:56px;height:56px;object-fit:contain;background:#fff;border-radius:10px;border:1px solid #e0e0e4;margin:0 0 10px}
-.thumbs{display:flex;gap:8px;overflow-x:auto;margin:0 0 10px}
+.ta::placeholder{color:#b0b0b8}
+.pv{display:none;width:56px;height:56px;object-fit:contain;background:#fff;border-radius:8px;border:1px solid #ececf0;margin:12px 0 4px}
+.thumbs{display:flex;gap:8px;overflow-x:auto;margin:12px 0 4px}
 .th{flex:none;width:56px;text-align:center;font-size:11px;color:#8e8e93}
-.th img{width:56px;height:56px;object-fit:contain;background:#fff;border-radius:10px;border:1px solid #e0e0e4}
-.th button{display:block;width:100%;border:0;background:#f2f2f4;border-radius:99px;font-size:11px;margin-top:3px;padding:2px 0}
-.add{display:block;width:100%;background:transparent;border:0;border-top:1px solid #efeff2;color:#8e8e93;padding:20px 0 22px;font-size:15px;margin-bottom:6px}
-.opt{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;color:#8e8e93;margin:0 4px 18px;flex-wrap:wrap}
-.opt input{width:56px;font-size:15px;text-align:center;border:0;background:#fff;color:#111;border-radius:99px;padding:6px}
-.go{display:block;width:100%;border:0;background:#111;color:#fff;border-radius:99px;padding:16px;font-size:16px;font-weight:700}
-.go:disabled{opacity:.5}
-#st{font-size:13px;text-align:center;color:#8e8e93;min-height:18px;margin:12px 0 0}
-#cv{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:0;top:0}
-#out video{display:block;width:70%;margin:12px auto;border-radius:16px}
-#out .go{margin-top:8px}
-.hint{font-size:12px;color:#8e8e93;text-align:center}
-#cimgs{border-top:1px solid #efeff2;padding-top:20px}
-#cimgs .btn{margin:0 0 6px}
-.adv{margin:0 4px 16px;color:#8e8e93;font-size:13px}
-.adv summary{padding:4px 0}
-.cut{display:none;margin:0 0 10px}
+.th img{width:56px;height:56px;object-fit:contain;background:#fff;border-radius:8px;border:1px solid #ececf0}
+.th button{display:block;width:100%;border:0;background:none;font-size:12px;color:#8e8e93;margin-top:2px;padding:2px 0}
+.mini{display:flex;gap:6px;margin:0 0 6px}
+.mini .sub{padding:6px 12px 6px 0}
+.mini .sub.on,.chips .sub.on{color:#111;font-weight:600;text-decoration:underline}
+.chips{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0 0}
+.chips .sub{padding:6px 10px 6px 0}
+.cut{display:none;margin:0 0 6px}
 .cut.on{display:block}
-.cut canvas{width:100%;display:block;margin:8px 0;border-radius:12px;background:#fff;border:1px solid #e0e0e4}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 0}
-.chips .sub.on{background:#111;color:#fff}
-.note{font-size:12px;color:#8e8e93;margin:6px 0}
-#sets .blk:first-child{border-top:0;padding-top:8px}
-.mini{display:flex;gap:6px;margin:0 0 10px}
-.mini .sub.on{background:#111;color:#fff}
+.cut canvas{width:100%;display:block;margin:10px 0 4px;border:1px solid #ececf0}
+.note{font-size:12px;color:#8e8e93;margin:6px 0;line-height:1.6}
+.add{display:block;width:100%;background:none;border:0;border-top:1px solid #ececf0;color:#8e8e93;padding:18px 20px 20px;font-size:15px;text-align:left;font-family:inherit}
+.opt{display:flex;justify-content:center;align-items:center;gap:36px;font-size:14px;color:#8e8e93;margin:18px 20px;flex-wrap:wrap}
+.opt input{width:52px;font-size:16px;text-align:center;border:0;border-bottom:1px solid #d6d6dc;border-radius:0;background:none;color:#111;padding:4px 0;font-family:inherit}
+.adv{margin:0 20px 18px;color:#8e8e93;font-size:13px;text-align:center}
+.adv summary{padding:4px 0}
+.go{display:block;width:100%;border:0;border-radius:0;background:#111;color:#fff;padding:20px;font-size:16px;font-weight:700;font-family:inherit}
+.go:disabled{opacity:.5}
+#st{font-size:13px;text-align:center;color:#8e8e93;min-height:18px;margin:12px 20px 0}
+#cv{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:0;top:0}
+#out video{display:block;width:70%;margin:14px auto;border-radius:12px}
+.hint{font-size:12px;color:#8e8e93;text-align:center;margin:8px 20px}
+#cimgs{border-top:1px solid #ececf0;padding:0 20px}
 .hide{display:none!important}
-.wipe{display:block;margin:26px auto 0;border:0;background:transparent;color:#a0a0a8;font-size:12px;text-decoration:underline}
+.wipe{display:block;margin:28px auto 0;border:0;background:none;color:#a0a0a8;font-size:12px;text-decoration:underline;font-family:inherit}
+#splash{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#0b0b0c;color:#fff;transition:opacity .6s}
+#splash span{font-size:46px;font-weight:300;letter-spacing:.24em;padding-left:.24em;animation:sp 1.7s ease both}
+#splash.out{opacity:0;pointer-events:none}
+@keyframes sp{0%{opacity:0;transform:scale(.94);letter-spacing:.42em}40%{opacity:1}100%{opacity:1;transform:none;letter-spacing:.24em}}
 </style>
 </head>
 <body>
-<h1>Momiji_X</h1>
+<div id="splash"><span>Mars</span></div>
+<h1>Mars</h1>
 <div id="ttlbox"></div>
 <div id="post"></div>
 <div id="cimgs"></div>
@@ -124,7 +131,7 @@ function drawFrame(img,text,fy,one){
 }
 
 function fileBtn(label,multi,accept,onpick){
-  const wrap=document.createElement("div");
+  const wrap=document.createElement("div");wrap.className="fb";
   const b=document.createElement("button");b.type="button";b.className="btn";b.textContent=label;
   const inp=document.createElement("input");inp.type="file";inp.style.display="none";
   if(multi)inp.multiple=true;
@@ -179,7 +186,8 @@ async function doSave(){
     post:{ta:post.ta.value,rd:post.rd.value,imgs:post.imgs.map(o=>o.file),file:post.file},
     sets:sets.map(s=>({ta:s.ta.value,rd:s.rd.value,img:s.imgFile,file:s.file}))})}catch(e){}
 }
-document.addEventListener("input",save);
+function grow(t){if(t.scrollHeight>0){t.style.height="auto";t.style.height=t.scrollHeight+"px"}}
+document.addEventListener("input",e=>{if(e.target.tagName==="TEXTAREA")grow(e.target);save()});
 
 function mkMini(s){
   const d=document.createElement("div");d.className="mini";
@@ -187,7 +195,7 @@ function mkMini(s){
   const b1=mkc("読み上げ修正"),b2=mkc("音声ファイル");
   const set1=v=>{s.rd.classList.toggle("hide",!v);b1.classList.toggle("on",v)};
   const set2=v=>{s.audBtn.classList.toggle("hide",!v);b2.classList.toggle("on",v)};
-  b1.onclick=()=>{const v=s.rd.classList.contains("hide");set1(v);if(v)s.rd.focus()};
+  b1.onclick=()=>{const v=s.rd.classList.contains("hide");set1(v);if(v){grow(s.rd);s.rd.focus()}};
   b2.onclick=()=>set2(s.audBtn.classList.contains("hide"));
   s.reveal=()=>{if(s.rd.value.trim())set1(true);if(s.file)set2(true)};
   s.hideAll=()=>{set1(false);set2(false)};
@@ -245,7 +253,7 @@ function buildCut(s){
   const bCut=mk("区切り位置",()=>setMode("cut")),bFoot=mk("下の情報の位置",()=>setMode("foot"));
   mk("1つ戻す",()=>{shot.taps.pop();redraw()});
   mk("全部消す",()=>{shot.taps=[];redraw()});
-  const mkb=document.createElement("button");mkb.type="button";mkb.className="btn";mkb.style.cssText="background:#111;color:#fff;margin:8px 0 0";mkb.textContent="画像を作る";
+  const mkb=document.createElement("button");mkb.type="button";mkb.className="btn";mkb.textContent="画像を作る";
   const isInk=(i)=>shot.d[i]+shot.d[i+1]+shot.d[i+2]<600;
   function analyze(){
     const c=document.createElement("canvas");c.width=shot.w;c.height=shot.h;
@@ -467,9 +475,11 @@ async function restore(){
       s.reveal();
     }
   }else addSet();
+  document.querySelectorAll("textarea").forEach(grow);
   ready=true;
 }
 restore();drawBase();
+setTimeout(()=>{const sp=$("splash");sp.classList.add("out");setTimeout(()=>sp.remove(),700)},2300);
 $("wipe").onclick=async()=>{
   if(!confirm("入力した内容と選んだ画像・音声をすべて消します。よろしいですか?"))return;
   ready=false;
