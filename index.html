@@ -5,19 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mars</title>
 <meta name="apple-mobile-web-app-title" content="Mars">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300&display=swap" rel="stylesheet">
 <style>
 :root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}
-body{margin:0 auto;padding:0 0 40px;max-width:520px;background:#fff;color:#111;font-family:-apple-system,"Hiragino Sans",sans-serif;counter-reset:n}
+body{margin:0 auto;padding:0 0 40px;max-width:520px;background:#fff;color:#111;font-family:-apple-system,"Hiragino Sans",sans-serif}
 h1{text-align:center;font-size:20px;font-weight:700;letter-spacing:.16em;margin:18px 0 22px}
-.blk{counter-increment:n;padding:22px 20px;border-top:1px solid #ececf0}
+.blk{padding:22px 20px;border-top:1px solid #ececf0}
 #ttlbox .blk{border-top:0;padding-top:4px}
-#sets .blk:first-child{border-top:0;padding-top:8px}
 .blk h2{display:flex;justify-content:space-between;align-items:center;margin:0 0 8px;font-size:12px;font-weight:600;letter-spacing:.1em;color:#8e8e93}
-.blk h2::before{content:"0" counter(n);color:#c2c2c8;letter-spacing:.1em;margin-right:10px}
-.blk h2 .ttl{flex:1}
-#post .blk,#ttlbox .blk{counter-increment:none}
-#post .blk h2::before,#ttlbox .blk h2::before{content:none}
+.blk h2 .ttl{flex:none}
 .hb{display:flex;gap:2px}
 .sub{border:0;background:none;color:#8e8e93;padding:6px 8px;font-size:13px;font-family:inherit}
 .fb .btn{display:flex;justify-content:space-between;align-items:center;width:100%;margin:0;background:none;border:0;border-bottom:1px solid #ececf0;border-radius:0;padding:15px 0;font-size:16px;font-weight:400;color:#111;text-align:left}
@@ -32,8 +31,8 @@ h1{text-align:center;font-size:20px;font-weight:700;letter-spacing:.16em;margin:
 .th{flex:none;width:56px;text-align:center;font-size:11px;color:#8e8e93}
 .th img{width:56px;height:56px;object-fit:contain;background:#fff;border-radius:8px;border:1px solid #ececf0}
 .th button{display:block;width:100%;border:0;background:none;font-size:12px;color:#8e8e93;margin-top:2px;padding:2px 0}
-.mini{display:flex;gap:6px;margin:0 0 6px}
-.mini .sub{padding:6px 12px 6px 0}
+.mini{display:flex;flex:1;gap:0;margin:0 0 0 8px}
+.mini .sub{padding:4px 6px;font-size:11px}
 .mini .sub.on,.chips .sub.on{color:#111;font-weight:600;text-decoration:underline}
 .chips{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0 0}
 .chips .sub{padding:6px 10px 6px 0}
@@ -46,17 +45,17 @@ h1{text-align:center;font-size:20px;font-weight:700;letter-spacing:.16em;margin:
 .opt input{width:52px;font-size:16px;text-align:center;border:0;border-bottom:1px solid #d6d6dc;border-radius:0;background:none;color:#111;padding:4px 0;font-family:inherit}
 .adv{margin:0 20px 18px;color:#8e8e93;font-size:13px;text-align:center}
 .adv summary{padding:4px 0}
-.go{display:block;width:100%;border:0;border-radius:0;background:#111;color:#fff;padding:20px;font-size:16px;font-weight:700;font-family:inherit}
+.go{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;border-top:1px solid #ececf0;border-bottom:1px solid #ececf0;border-radius:0;background:none;color:#111;padding:20px;font-size:16px;font-weight:700;font-family:inherit;text-align:left}
+.go::after{content:"›";color:#c4c4c9;font-size:22px;line-height:1;font-weight:400}
 .go:disabled{opacity:.5}
 #st{font-size:13px;text-align:center;color:#8e8e93;min-height:18px;margin:12px 20px 0}
 #cv{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:0;top:0}
 #out video{display:block;width:70%;margin:14px auto;border-radius:12px}
 .hint{font-size:12px;color:#8e8e93;text-align:center;margin:8px 20px}
-#cimgs{border-top:1px solid #ececf0;padding:0 20px}
 .hide{display:none!important}
 .wipe{display:block;margin:28px auto 0;border:0;background:none;color:#a0a0a8;font-size:12px;text-decoration:underline;font-family:inherit}
-#splash{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#0b0b0c;color:#fff;transition:opacity .6s}
-#splash span{font-size:46px;font-weight:300;letter-spacing:.24em;padding-left:.24em;animation:sp 1.7s ease both}
+#splash{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#fff;color:#111;transition:opacity .6s}
+#splash span{font-family:"Cormorant Garamond","Didot","Bodoni 72","Hoefler Text",Georgia,serif;font-size:56px;font-weight:300;letter-spacing:.24em;padding-left:.24em;animation:sp 1.7s ease both}
 #splash.out{opacity:0;pointer-events:none}
 @keyframes sp{0%{opacity:0;transform:scale(.94);letter-spacing:.42em}40%{opacity:1}100%{opacity:1;transform:none;letter-spacing:.24em}}
 </style>
@@ -66,11 +65,9 @@ h1{text-align:center;font-size:20px;font-weight:700;letter-spacing:.16em;margin:
 <h1>Mars</h1>
 <div id="ttlbox"></div>
 <div id="post"></div>
-<div id="cimgs"></div>
 <div id="sets"></div>
-<button class="add" id="add">＋ コメントを追加</button>
-<div class="opt" style="justify-content:center;gap:36px"><span>速度 <input type="number" id="spd" value="1" step="0.05" min="0.5" max="2"></span><span>間隔 <input type="number" id="gap" value="0.4" step="0.1" min="0"> 秒</span></div>
-<details class="adv"><summary>調整</summary><div class="opt" style="margin-top:8px"><span>字幕を早める <input type="number" id="sync" value="0" step="0.05" min="-1" max="2"> 秒</span><span>終わりの余白 <input type="number" id="tail" value="1.5" step="0.5" min="0" max="10"> 秒</span></div></details>
+<button class="add" id="add">＋ コメント2</button>
+<details class="adv"><summary>調整</summary><div class="opt" style="margin-top:8px"><span>速度 <input type="number" id="spd" value="1" step="0.05" min="0.5" max="2"></span><span>間隔 <input type="number" id="gap" value="0.4" step="0.1" min="0"> 秒</span><span>字幕を早める <input type="number" id="sync" value="0" step="0.05" min="-1" max="2"> 秒</span><span>終わりの余白 <input type="number" id="tail" value="1.5" step="0.5" min="0" max="10"> 秒</span></div></details>
 <button class="go" id="go">動画を作る</button>
 <p id="st"></p>
 <canvas id="cv" width="1080" height="1920"></canvas>
@@ -192,7 +189,7 @@ document.addEventListener("input",e=>{if(e.target.tagName==="TEXTAREA")grow(e.ta
 function mkMini(s){
   const d=document.createElement("div");d.className="mini";
   const mkc=t=>{const b=document.createElement("button");b.type="button";b.className="sub";b.textContent=t;d.appendChild(b);return b};
-  const b1=mkc("読み上げ修正"),b2=mkc("音声ファイル");
+  const b1=mkc("読み"),b2=mkc("音声");
   const set1=v=>{s.rd.classList.toggle("hide",!v);b1.classList.toggle("on",v)};
   const set2=v=>{s.audBtn.classList.toggle("hide",!v);b2.classList.toggle("on",v)};
   b1.onclick=()=>{const v=s.rd.classList.contains("hide");set1(v);if(v){grow(s.rd);s.rd.focus()}};
@@ -208,7 +205,7 @@ function addSet(){
   const h=document.createElement("h2");
   h.innerHTML='<span class="ttl"></span><span class="hb"><button class="sub up" type="button">↑</button><button class="sub dn" type="button">↓</button><button class="sub sl" type="button">／</button><button class="sub del" type="button">削除</button></span>';
   const pv=document.createElement("img");pv.className="pv";
-  s.ta=mkTa("字幕(改行で字幕を切り替え。／で字幕の中で改行)");s.rd=mkTa("読み上げ修正","s");s.card=card;
+  s.ta=mkTa("字幕");s.rd=mkTa("読み上げ修正","s");s.card=card;
   s.imgBtn=fileBtn("画像を選択",false,"image/*",fl=>{if(fl[0])s.setImg(fl[0])});
   s.audBtn=fileBtn("音声ファイルを選択",false,"",fl=>{s.setAudio(fl[0]||null)});
   s.setImg=async f=>{
@@ -222,7 +219,8 @@ function addSet(){
     s.ta.value="";s.rd.value="";s.imgBtn.reset();s.audBtn.reset();s.hideAll();save();
   };
   const mini=mkMini(s);
-  card.append(h,s.imgBtn,pv,s.ta,mini,s.rd,s.audBtn);
+  h.insertBefore(mini,h.querySelector(".hb"));
+  card.append(h,s.imgBtn,pv,s.ta,s.rd,s.audBtn);
   h.querySelector(".sl").onclick=()=>insSlash(s.ta);
   h.querySelector(".up").onclick=()=>moveSet(s,-1);
   h.querySelector(".dn").onclick=()=>moveSet(s,1);
@@ -371,7 +369,8 @@ function buildPost(){
     s.imgs=[];s.file=null;s.ta.value="";s.rd.value="";render();s.imgBtn.reset();s.audBtn.reset();s.hideAll();cut.load(null);save();
   };
   const mini=mkMini(s);
-  card.append(h,s.imgBtn,cut.panel,th,s.ta,mini,s.rd,s.audBtn);
+  h.insertBefore(mini,h.querySelector(".hb"));
+  card.append(h,s.imgBtn,cut.panel,th,s.ta,s.rd,s.audBtn);
   $("post").appendChild(card);
 }
 buildPost();
@@ -393,15 +392,11 @@ const titleTa=mkTa("TikTokのタイトル","s");
   card.append(h,titleTa);
   $("ttlbox").appendChild(card);
 })();
-const cb=fileBtn("コメント画像をまとめて選択",true,"image/*",async fl=>{
-  for(let i=0;i<fl.length;i++){while(sets.length<=i)addSet();await sets[i].setImg(fl[i])}
-  cb.reset();
-});
-$("cimgs").appendChild(cb);
 function renum(){
   sets.forEach((s,i)=>{
-    s.card.querySelector(".ttl").textContent="コメント "+(i+1);
+    s.card.querySelector(".ttl").textContent="コメント"+(i+1);
   });
+  $("add").textContent="＋ コメント"+(sets.length+1);
 }
 $("add").onclick=()=>{addSet();save();sets[sets.length-1].card.scrollIntoView({behavior:"smooth"})};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
