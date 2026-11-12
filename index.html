@@ -14,8 +14,11 @@
 body{margin:0 auto;padding:0 0 40px;max-width:520px;background:#fff;color:#111;font-family:-apple-system,"Hiragino Sans",sans-serif}
 h1{text-align:center;font-size:20px;font-weight:700;letter-spacing:.16em;margin:18px 0 22px}
 .blk{padding:22px 20px;border-top:1px solid #ececf0}
-#ttlbox .blk{border-top:0;padding-top:4px}
-#post .blk{border-top:0}
+#ttlbox .blk{border-top:0;padding-top:4px;padding-bottom:0}
+#post .blk{border-top:0;padding-top:6px}
+.trow{display:flex;align-items:flex-end;gap:6px}
+.trow .ta{flex:1;margin:0}
+.trow .sub{padding:12px 0 12px 8px;flex:none}
 .blk h2{display:flex;justify-content:space-between;align-items:center;margin:0 0 8px;font-size:12px;font-weight:600;letter-spacing:.1em;color:#8e8e93}
 .blk h2 .ttl{flex:none}
 .hb{display:flex;gap:2px}
@@ -41,12 +44,15 @@ h1{text-align:center;font-size:20px;font-weight:700;letter-spacing:.16em;margin:
 .cut.on{display:block}
 .cut canvas{width:100%;display:block;margin:10px 0 4px;border:1px solid #ececf0}
 .note{font-size:12px;color:#8e8e93;margin:6px 0;line-height:1.6}
-.add{display:block;width:100%;background:none;border:0;border-top:1px solid #ececf0;color:#8e8e93;padding:18px 20px 20px;font-size:15px;text-align:left;font-family:inherit}
+.add{display:block;width:100%;background:none;border:0;border-top:1px solid #ececf0;color:#8e8e93;padding:18px 20px 20px;font-size:15px;text-align:center;font-family:inherit}
 .opt{display:flex;justify-content:center;align-items:center;gap:36px;font-size:14px;color:#8e8e93;margin:18px 20px;flex-wrap:wrap}
 .opt input{width:52px;font-size:16px;text-align:center;border:0;border-bottom:1px solid #d6d6dc;border-radius:0;background:none;color:#111;padding:4px 0;font-family:inherit}
 .adv{margin:0 20px 8px;color:#8e8e93;font-size:13px;text-align:center}
 .adv summary{padding:4px 0}
-.adv .opt{flex-direction:column;gap:14px;margin:12px 0 8px}
+.adv .opt{display:grid;grid-template-columns:auto 52px 1.2em;gap:14px 8px;justify-content:center;align-items:center;margin:12px 0 8px}
+.adv .opt span{display:contents}
+.adv .opt em{font-style:normal;text-align:right}
+.adv .opt u{text-decoration:none;text-align:left}
 .go{display:block;width:100%;border:0;border-radius:0;background:none;color:#111;padding:20px;font-size:16px;font-weight:700;font-family:inherit;text-align:center}
 .go:disabled{opacity:.5}
 #st{font-size:13px;text-align:center;color:#8e8e93;min-height:18px;margin:12px 20px 0}
@@ -68,7 +74,7 @@ h1{text-align:center;font-size:20px;font-weight:700;letter-spacing:.16em;margin:
 <div id="post"></div>
 <div id="sets"></div>
 <button class="add" id="add">＋ コメント2</button>
-<details class="adv"><summary>調整</summary><div class="opt"><span>速度 <input type="number" id="spd" value="1" step="0.05" min="0.5" max="2"></span><span>間隔 <input type="number" id="gap" value="0.4" step="0.1" min="0"> 秒</span><span>字幕を早める <input type="number" id="sync" value="0" step="0.05" min="-1" max="2"> 秒</span><span>終わりの余白 <input type="number" id="tail" value="1.5" step="0.5" min="0" max="10"> 秒</span></div></details>
+<details class="adv"><summary>調整</summary><div class="opt"><span><em>速度</em><input type="number" id="spd" value="1" step="0.05" min="0.5" max="2"><u></u></span><span><em>間隔</em><input type="number" id="gap" value="0.4" step="0.1" min="0"><u>秒</u></span><span><em>字幕を早める</em><input type="number" id="sync" value="0" step="0.05" min="-1" max="2"><u>秒</u></span><span><em>終わりの余白</em><input type="number" id="tail" value="1.5" step="0.5" min="0" max="10"><u>秒</u></span></div></details>
 <button class="go" id="go">動画を作る</button>
 <p id="st"></p>
 <canvas id="cv" width="1080" height="1920"></canvas>
@@ -378,12 +384,11 @@ function buildPost(){
   $("post").appendChild(card);
 }
 buildPost();
-const titleTa=mkTa("TikTokのタイトル","s");
+const titleTa=mkTa("タイトル","s");
 (function(){
   const card=document.createElement("div");card.className="blk";
-  const h=document.createElement("h2");
-  h.innerHTML='<span class="ttl">タイトル</span><span class="hb"><button class="sub cp" type="button">コピー</button></span>';
-  const btn=h.querySelector(".cp");
+  const row=document.createElement("div");row.className="trow";
+  const btn=document.createElement("button");btn.type="button";btn.className="sub";btn.textContent="コピー";
   btn.onclick=async()=>{
     const t=titleTa.value;if(!t)return;
     let ok=false;
@@ -392,8 +397,8 @@ const titleTa=mkTa("TikTokのタイトル","s");
     btn.textContent=ok?"コピーしました":"コピーできません";
     setTimeout(()=>{btn.textContent="コピー"},1300);
   };
-  titleTa.style.marginBottom="0";
-  card.append(h,titleTa);
+  row.append(titleTa,btn);
+  card.append(row);
   $("ttlbox").appendChild(card);
 })();
 function renum(){
