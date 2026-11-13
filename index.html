@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
-:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}
 body{margin:0 auto;padding:0 0 40px;max-width:520px;background:#fff;color:#111;font-family:-apple-system,"Hiragino Sans",sans-serif}
 h1{text-align:center;font-size:20px;font-weight:700;letter-spacing:.16em;margin:18px 0 22px}
@@ -19,10 +19,18 @@ h1{text-align:center;font-size:20px;font-weight:700;letter-spacing:.16em;margin:
 .trow{display:flex;align-items:flex-end;gap:6px}
 .trow .ta{flex:1;margin:0}
 .trow .sub{padding:12px 0 12px 8px;flex:none}
-.blk h2{display:flex;justify-content:space-between;align-items:center;margin:0 0 8px;font-size:12px;font-weight:600;letter-spacing:.1em;color:#8e8e93}
+.blk h2{display:flex;align-items:center;margin:0 0 8px;min-height:34px;font-size:12px;font-weight:600;letter-spacing:.1em;color:#8e8e93}
 .blk h2 .ttl{flex:none}
-.hb{display:flex;gap:2px}
+.hb{display:flex}
 .sub{border:0;background:none;color:#8e8e93;padding:6px 8px;font-size:13px;font-family:inherit}
+.sub.mo{font-size:20px;line-height:1;padding:4px 10px}
+.blk.o .sub.mo{color:#111}
+.xt{display:none;align-items:center;margin-left:2px}
+.blk.o .xt{display:flex}
+.xt .sub{padding:6px 7px;font-size:12px}
+.tw{position:relative}
+.tw .ta{padding-right:32px}
+.tw .sl{position:absolute;right:0;bottom:12px;border:0;background:none;color:#8e8e93;font-family:inherit;font-size:17px;padding:4px 8px;line-height:1}
 .fb .btn{display:flex;justify-content:space-between;align-items:center;width:100%;margin:0;background:none;border:0;border-radius:0;padding:15px 0;font-size:16px;font-weight:400;color:#111;text-align:left}
 .fb .btn::after{content:"›";color:#c4c4c9;font-size:22px;line-height:1}
 .btn{display:block;width:100%;margin-top:10px;border:0;border-radius:99px;background:#111;color:#fff;padding:13px;font-size:15px;font-weight:600;font-family:inherit}
@@ -35,8 +43,7 @@ h1{text-align:center;font-size:20px;font-weight:700;letter-spacing:.16em;margin:
 .th{flex:none;width:56px;text-align:center;font-size:11px;color:#8e8e93}
 .th img{width:56px;height:56px;object-fit:contain;background:#fff;border-radius:8px;border:1px solid #ececf0}
 .th button{display:block;width:100%;border:0;background:none;font-size:12px;color:#8e8e93;margin-top:2px;padding:2px 0}
-.mini{display:flex;flex:1;gap:0;margin:0 0 0 8px}
-.mini .sub{padding:4px 6px;font-size:11px}
+.mini{display:flex}
 .mini .sub.on,.chips .sub.on{color:#111;font-weight:600;text-decoration:underline}
 .chips{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0 0}
 .chips .sub{padding:6px 10px 6px 0}
@@ -45,11 +52,10 @@ h1{text-align:center;font-size:20px;font-weight:700;letter-spacing:.16em;margin:
 .cut canvas{width:100%;display:block;margin:10px 0 4px;border:1px solid #ececf0}
 .note{font-size:12px;color:#8e8e93;margin:6px 0;line-height:1.6}
 .add{display:block;width:100%;background:none;border:0;border-top:1px solid #ececf0;color:#8e8e93;padding:18px 20px 20px;font-size:15px;text-align:center;font-family:inherit}
-.opt{display:flex;justify-content:center;align-items:center;gap:36px;font-size:14px;color:#8e8e93;margin:18px 20px;flex-wrap:wrap}
 .opt input{width:52px;font-size:16px;text-align:center;border:0;border-bottom:1px solid #d6d6dc;border-radius:0;background:none;color:#111;padding:4px 0;font-family:inherit}
 .adv{margin:0 20px 8px;color:#8e8e93;font-size:13px;text-align:center}
 .adv summary{padding:4px 0}
-.adv .opt{display:grid;grid-template-columns:auto 52px 1.2em;gap:14px 8px;justify-content:center;align-items:center;margin:12px 0 8px}
+.adv .opt{display:grid;grid-template-columns:auto 52px 1.2em;gap:14px 8px;justify-content:center;align-items:center;margin:12px 0 8px;font-size:14px}
 .adv .opt span{display:contents}
 .adv .opt em{font-style:normal;text-align:right}
 .adv .opt u{text-decoration:none;text-align:left}
@@ -83,9 +89,6 @@ h1{text-align:center;font-size:20px;font-weight:700;letter-spacing:.16em;margin:
 <button class="wipe" id="wipe" type="button">保存データをすべて消す</button>
 
 <script>
-window.addEventListener("error",e=>{const s=document.getElementById("st");if(s)s.textContent="エラー: "+(e.message||"不明")});
-window.addEventListener("unhandledrejection",e=>{const s=document.getElementById("st");if(s)s.textContent="エラー: "+((e.reason&&e.reason.message)||e.reason||"不明")});
-setTimeout(()=>{const sp=document.getElementById("splash");if(sp)sp.remove()},3200);
 const W=1080,H=1920,BG="#EAFAFF";
 const CAP_C=Math.round(H*0.285-110*1.3),IMG_TOP=Math.round(H*0.315);
 let FR=0;
@@ -119,7 +122,7 @@ function wrap(t,max){
 }
 let LI=null,LT=null,LO=null;
 function pix(){ctx.fillStyle=(FR++&1)?"#EAFAFF":"#E9FAFF";ctx.fillRect(0,H-6,6,6)}
-function drawFrame(img,text,fy,one){
+function drawFrame(img,text,one){
   if(img===LI&&text===LT&&one===LO){pix();return}
   LI=img;LT=text;LO=one;
   drawBase();
@@ -160,6 +163,13 @@ function insSlash(t){
   save();
 }
 function mkTa(ph,cls){const t=document.createElement("textarea");t.className="ta"+(cls?" "+cls:"");t.placeholder=ph;return t}
+function mkTw(ta){
+  const w=document.createElement("div");w.className="tw";
+  const b=document.createElement("button");b.type="button";b.className="sl";b.textContent="／";
+  b.onmousedown=e=>e.preventDefault();
+  b.onclick=()=>insSlash(ta);
+  w.append(ta,b);return w;
+}
 async function loadImg(f){
   const url=URL.createObjectURL(f),el=new Image();el.src=url;
   try{await el.decode()}catch(_){}
@@ -213,9 +223,10 @@ function addSet(){
   const s={img:null,imgFile:null,file:null};
   const card=document.createElement("div");card.className="blk";
   const h=document.createElement("h2");
-  h.innerHTML='<span class="ttl"></span><span class="hb"><button class="sub up" type="button">↑</button><button class="sub dn" type="button">↓</button><button class="sub sl" type="button">／</button><button class="sub del" type="button">削除</button></span>';
+  h.innerHTML='<span class="ttl"></span><button class="sub mo" type="button">⋯</button><span class="xt"><span class="hb"><button class="sub up" type="button">↑</button><button class="sub dn" type="button">↓</button><button class="sub del" type="button">削除</button></span></span>';
   const pv=document.createElement("img");pv.className="pv";
   s.ta=mkTa("字幕");s.rd=mkTa("読み上げ修正","s");s.card=card;
+  const tw=mkTw(s.ta);
   s.imgBtn=fileBtn("画像を選択",false,"image/*",fl=>{if(fl[0])s.setImg(fl[0])});
   s.audBtn=fileBtn("音声ファイルを選択",false,"",fl=>{s.setAudio(fl[0]||null)});
   s.setImg=async f=>{
@@ -229,9 +240,10 @@ function addSet(){
     s.ta.value="";s.rd.value="";s.imgBtn.reset();s.audBtn.reset();s.hideAll();save();
   };
   const mini=mkMini(s);
-  h.insertBefore(mini,h.querySelector(".hb"));
-  card.append(h,s.imgBtn,pv,s.ta,s.rd,s.audBtn);
-  h.querySelector(".sl").onclick=()=>insSlash(s.ta);
+  const xt=h.querySelector(".xt");
+  xt.insertBefore(mini,xt.firstChild);
+  h.querySelector(".mo").onclick=()=>card.classList.toggle("o");
+  card.append(h,s.imgBtn,pv,tw,s.rd,s.audBtn);
   h.querySelector(".up").onclick=()=>moveSet(s,-1);
   h.querySelector(".dn").onclick=()=>moveSet(s,1);
   h.querySelector(".del").onclick=()=>{
@@ -294,7 +306,7 @@ function buildCut(s){
     }
     return x;
   }
-  function pt(t){const b=bandAt(t.y);return {band:b,x:snapX(b,t.x),top:Math.max(0,b.top-2),bottom:Math.min(shot.h-1,b.bottom+2)}}
+  function pt(t){const b=bandAt(t.y);return {x:snapX(b,t.x),top:Math.max(0,b.top-2),bottom:Math.min(shot.h-1,b.bottom+2)}}
   function redraw(){
     if(!shot.img)return;
     sc.width=shot.w;sc.height=shot.h;
@@ -353,7 +365,7 @@ function buildPost(){
   const s=post;
   const card=document.createElement("div");card.className="blk";
   const h=document.createElement("h2");
-  h.innerHTML='<span class="ttl">ポスト本文</span><span class="hb"><button class="sub sl" type="button">／</button><button class="sub del" type="button">削除</button></span>';
+  h.innerHTML='<span class="ttl">ポスト本文</span><button class="sub mo" type="button">⋯</button><span class="xt"><span class="hb"><button class="sub del" type="button">削除</button></span></span>';
   const th=document.createElement("div");th.className="thumbs";
   const render=()=>{
     th.innerHTML="";
@@ -365,6 +377,7 @@ function buildPost(){
     });
   };
   s.ta=mkTa("字幕");s.rd=mkTa("読み上げ修正","s");s.card=card;
+  const tw=mkTw(s.ta);
   const cut=buildCut(s);
   s.imgBtn=fileBtn("画像を選択",true,"image/*",fl=>{s.setImgs(fl);cut.load(fl.length===1?fl[0]:null)});
   s.audBtn=fileBtn("音声ファイルを選択",false,"",fl=>s.setAudio(fl[0]||null));
@@ -374,13 +387,14 @@ function buildPost(){
     render();s.imgBtn.set(fl.length?"✓ "+fl.length+"枚":"画像を選択");save();
   };
   s.setAudio=f=>{s.file=f;s.audBtn.set(f?"✓ "+f.name.slice(0,18):"音声ファイルを選択");if(f&&s.reveal)s.reveal();save()};
-  h.querySelector(".sl").onclick=()=>insSlash(s.ta);
   h.querySelector(".del").onclick=()=>{
     s.imgs=[];s.file=null;s.ta.value="";s.rd.value="";render();s.imgBtn.reset();s.audBtn.reset();s.hideAll();cut.load(null);save();
   };
   const mini=mkMini(s);
-  h.insertBefore(mini,h.querySelector(".hb"));
-  card.append(h,s.imgBtn,cut.panel,th,s.ta,s.rd,s.audBtn);
+  const xt=h.querySelector(".xt");
+  xt.insertBefore(mini,xt.firstChild);
+  h.querySelector(".mo").onclick=()=>card.classList.toggle("o");
+  card.append(h,s.imgBtn,cut.panel,th,tw,s.rd,s.audBtn);
   $("post").appendChild(card);
 }
 buildPost();
@@ -546,7 +560,7 @@ $("go").onclick=async()=>{
       let cur=all[0];
       for(const s of all){if(s.t0<=t)cur=s}
       const seg=cur.segs.find(g=>t>=g.t0&&t<g.t1)||(t<cur.t0+cur.dur?cur.segs[0]:cur.segs[cur.segs.length-1]);
-      return cur.isPost?[post.imgs[seg.i].el,seg.text]:[cur.img,seg.text,undefined,cur.one];
+      return cur.isPost?[post.imgs[seg.i].el,seg.text]:[cur.img,seg.text,cur.one];
     };
     const dest=ac.createMediaStreamDestination();
     const stream=cv.captureStream(30);
