@@ -14,13 +14,13 @@
 body{margin:0 auto;padding:0 0 40px;max-width:520px;background:#fff;color:#111;font-family:-apple-system,"Hiragino Sans",sans-serif}
 h1,#splash .lg{font-family:"Italiana","Didot","Bodoni 72","Hoefler Text",Georgia,serif;font-weight:400;letter-spacing:.3em;padding-left:.3em}
 h1{text-align:center;font-size:28px;margin:16px 0 20px}
-.blk{padding:22px 20px;border-top:1px solid #ececf0}
-#ttlbox .blk{border-top:0;padding-top:4px;padding-bottom:0}
-#post .blk{border-top:0;padding-top:6px}
+.blk{padding:18px 20px}
+#ttlbox .blk{padding-top:4px;padding-bottom:0}
+#post .blk{padding-top:6px}
 .trow{display:flex;align-items:flex-end;gap:6px}
 .trow .ta{flex:1;margin:0}
 .trow .sub{padding:12px 0 12px 8px;flex:none}
-.blk h2{display:flex;align-items:center;margin:0 0 8px;min-height:34px;font-size:12px;font-weight:600;letter-spacing:.1em;color:#8e8e93}
+.blk h2{display:flex;flex-wrap:wrap;align-items:center;margin:0 0 8px;min-height:34px;font-size:12px;font-weight:600;letter-spacing:.1em;color:#8e8e93}
 .blk h2 .ttl{flex:none}
 .hb{display:flex}
 .sub{border:0;background:none;color:#8e8e93;padding:6px 8px;font-size:13px;font-family:inherit}
@@ -32,14 +32,19 @@ h1{text-align:center;font-size:28px;margin:16px 0 20px}
 .tw{position:relative}
 .tw .ta{padding-right:32px}
 .tw .sl{position:absolute;right:0;bottom:12px;border:0;background:none;color:#8e8e93;font-family:inherit;font-size:17px;padding:4px 8px;line-height:1}
+.sr{display:flex;align-items:flex-start}
+.sr .tw{flex:1;min-width:0}
 .fb .btn{display:flex;justify-content:space-between;align-items:center;width:100%;margin:0;background:none;border:0;border-radius:0;padding:15px 0;font-size:16px;font-weight:400;color:#111;text-align:left}
 .fb .btn::after{content:"›";color:#c4c4c9;font-size:22px;line-height:1}
+.fb.ib .btn{display:block;width:auto;padding:6px 8px;font-size:13px;color:#8e8e93}
+.fb.ib .btn::after{content:none}
+.fb.ib .btn.sel{color:#111}
 .btn{display:block;width:100%;margin-top:10px;border:0;border-radius:99px;background:#111;color:#fff;padding:13px;font-size:15px;font-weight:600;font-family:inherit}
 .ta{display:block;width:100%;min-height:64px;border:0;border-bottom:1px solid #e3e3e8;border-radius:0;background:transparent;color:#111;padding:12px 0;font-size:17px;margin:0 0 6px;font-family:inherit;resize:none;outline:0}
 .ta:focus{border-bottom-color:#111}
 .ta.s{min-height:44px}
 .ta::placeholder{color:#b0b0b8}
-.pv{display:none;width:56px;height:56px;object-fit:contain;background:#fff;border-radius:8px;border:1px solid #ececf0;margin:12px 0 4px}
+.pv{display:none;flex:none;width:56px;height:56px;object-fit:contain;background:#fff;border-radius:8px;border:1px solid #ececf0;margin:6px 0 0 12px}
 .thumbs{display:flex;gap:8px;overflow-x:auto;margin:12px 0 4px}
 .th{flex:none;width:56px;text-align:center;font-size:11px;color:#8e8e93}
 .th img{width:56px;height:56px;object-fit:contain;background:#fff;border-radius:8px;border:1px solid #ececf0}
@@ -52,22 +57,27 @@ h1{text-align:center;font-size:28px;margin:16px 0 20px}
 .cut.on{display:block}
 .cut canvas{width:100%;display:block;margin:10px 0 4px;border:1px solid #ececf0}
 .note{font-size:12px;color:#8e8e93;margin:6px 0;line-height:1.6}
-.add{display:block;width:100%;background:none;border:0;border-top:1px solid #ececf0;color:#8e8e93;padding:18px 20px 20px;font-size:15px;text-align:center;font-family:inherit}
+.add,.adv summary,.go,.wipe{display:block;width:100%;margin:0;padding:15px 20px;border:0;border-radius:0;background:none;font-family:inherit;text-align:center}
+.add{color:#8e8e93;font-size:15px}
+.adv{margin:0;color:#8e8e93}
+.adv summary{list-style:none;font-size:15px;color:#8e8e93;cursor:pointer}
+.adv summary::-webkit-details-marker{display:none}
+.adv summary::before{content:"▸";margin-right:6px}
+.adv[open] summary::before{content:"▾"}
 .opt input{width:52px;font-size:16px;text-align:center;border:0;border-bottom:1px solid #d6d6dc;border-radius:0;background:none;color:#111;padding:4px 0;font-family:inherit}
-.adv{margin:0 20px 8px;color:#8e8e93;font-size:13px;text-align:center}
-.adv summary{padding:4px 0}
-.adv .opt{display:grid;grid-template-columns:auto 52px 1.2em;gap:14px 8px;justify-content:center;align-items:center;margin:12px 0 8px;font-size:14px}
+.adv .opt{display:grid;grid-template-columns:auto 52px 1.2em;gap:14px 8px;justify-content:center;align-items:center;margin:4px 0 10px;font-size:14px}
 .adv .opt span{display:contents}
 .adv .opt em{font-style:normal;text-align:right}
 .adv .opt u{text-decoration:none;text-align:left}
-.go{display:block;width:100%;border:0;border-radius:0;background:none;color:#111;padding:20px;font-size:16px;font-weight:700;font-family:inherit;text-align:center}
+.go{color:#111;font-size:16px;font-weight:700}
 .go:disabled{opacity:.5}
-#st{font-size:13px;text-align:center;color:#8e8e93;min-height:18px;margin:12px 20px 0}
+.wipe{color:#a0a0a8;font-size:15px}
+#st{font-size:13px;text-align:center;color:#8e8e93;margin:8px 20px}
 #cv{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:0;top:0}
 #out video{display:block;width:70%;margin:14px auto;border-radius:12px}
 .hint{font-size:12px;color:#8e8e93;text-align:center;margin:8px 20px}
+#st:empty,.hint:empty{display:none}
 .hide{display:none!important}
-.wipe{display:block;margin:28px auto 0;border:0;background:none;color:#a0a0a8;font-size:12px;text-decoration:underline;font-family:inherit}
 #splash{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#fff;color:#111;animation:spo .8s ease 2.6s forwards}
 #splash .lg{position:relative;display:flex;font-size:64px}
 #splash b{font-weight:400;opacity:0;animation:lt 1.1s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(.25s + var(--i)*.17s)}
@@ -90,7 +100,7 @@ h1{text-align:center;font-size:28px;margin:16px 0 20px}
 <canvas id="cv" width="1080" height="1920"></canvas>
 <div id="out"></div>
 <p class="hint" id="credit"></p>
-<button class="wipe" id="wipe" type="button">保存データをすべて消す</button>
+<button class="wipe" id="wipe" type="button">保存データを消去</button>
 
 <script>
 const W=1080,H=1920,BG="#EAFAFF";
@@ -144,8 +154,8 @@ function drawFrame(img,text,one){
   pix();
 }
 
-function fileBtn(label,multi,accept,onpick){
-  const wrap=document.createElement("div");wrap.className="fb";
+function fileBtn(label,multi,accept,onpick,inline){
+  const wrap=document.createElement("div");wrap.className="fb"+(inline?" ib":"");
   const b=document.createElement("button");b.type="button";b.className="btn";b.textContent=label;
   const inp=document.createElement("input");inp.type="file";inp.style.display="none";
   if(multi)inp.multiple=true;
@@ -153,11 +163,11 @@ function fileBtn(label,multi,accept,onpick){
   b.onclick=()=>inp.click();
   inp.onchange=()=>{
     const fl=[...inp.files];
-    wrap.set(fl.length?("✓ "+(fl.length>1?fl.length+"枚":fl[0].name.slice(0,18))):label);
+    wrap.set(fl.length?(inline?label+" ✓":"✓ "+(fl.length>1?fl.length+"枚":fl[0].name.slice(0,18))):label);
     onpick(fl);
   };
-  wrap.set=t=>{b.textContent=t};
-  wrap.reset=()=>{b.textContent=label;inp.value=""};
+  wrap.set=t=>{b.textContent=t;b.classList.toggle("sel",t!==label)};
+  wrap.reset=()=>{wrap.set(label);inp.value=""};
   wrap.append(b,inp);return wrap;
 }
 function insSlash(t){
@@ -231,12 +241,13 @@ function addSet(){
   const pv=document.createElement("img");pv.className="pv";
   s.ta=mkTa("字幕");s.rd=mkTa("読み上げ修正","s");s.card=card;
   const tw=mkTw(s.ta);
-  s.imgBtn=fileBtn("画像を選択",false,"image/*",fl=>{if(fl[0])s.setImg(fl[0])});
+  const sr=document.createElement("div");sr.className="sr";sr.append(tw,pv);
+  s.imgBtn=fileBtn("画像",false,"image/*",fl=>{if(fl[0])s.setImg(fl[0])},1);
   s.audBtn=fileBtn("音声ファイルを選択",false,"",fl=>{s.setAudio(fl[0]||null)});
   s.setImg=async f=>{
     const o=await loadImg(f);
     s.img=o.el;s.imgFile=f;pv.src=o.url;pv.style.display="block";
-    s.imgBtn.set("✓ "+(f.name||"画像").slice(0,18));save();
+    s.imgBtn.set("画像 ✓");save();
   };
   s.setAudio=f=>{s.file=f;s.audBtn.set(f?"✓ "+f.name.slice(0,18):"音声ファイルを選択");if(f&&s.reveal)s.reveal();save()};
   s.clear=()=>{
@@ -246,8 +257,9 @@ function addSet(){
   const mini=mkMini(s);
   const xt=h.querySelector(".xt");
   xt.insertBefore(mini,xt.firstChild);
+  h.insertBefore(s.imgBtn,h.querySelector(".mo"));
   h.querySelector(".mo").onclick=()=>card.classList.toggle("o");
-  card.append(h,s.imgBtn,pv,tw,s.rd,s.audBtn);
+  card.append(h,sr,s.rd,s.audBtn);
   h.querySelector(".up").onclick=()=>moveSet(s,-1);
   h.querySelector(".dn").onclick=()=>moveSet(s,1);
   h.querySelector(".del").onclick=()=>{
@@ -383,12 +395,12 @@ function buildPost(){
   s.ta=mkTa("字幕");s.rd=mkTa("読み上げ修正","s");s.card=card;
   const tw=mkTw(s.ta);
   const cut=buildCut(s);
-  s.imgBtn=fileBtn("画像を選択",true,"image/*",fl=>{s.setImgs(fl);cut.load(fl.length===1?fl[0]:null)});
+  s.imgBtn=fileBtn("画像",true,"image/*",fl=>{s.setImgs(fl);cut.load(fl.length===1?fl[0]:null)},1);
   s.audBtn=fileBtn("音声ファイルを選択",false,"",fl=>s.setAudio(fl[0]||null));
   s.setImgs=async fl=>{
     s.imgs=[];
     for(const f of fl){const o=await loadImg(f);o.file=f;o.el.__post=true;s.imgs.push(o)}
-    render();s.imgBtn.set(fl.length?"✓ "+fl.length+"枚":"画像を選択");save();
+    render();s.imgBtn.set(fl.length?"画像 ✓":"画像");save();
   };
   s.setAudio=f=>{s.file=f;s.audBtn.set(f?"✓ "+f.name.slice(0,18):"音声ファイルを選択");if(f&&s.reveal)s.reveal();save()};
   h.querySelector(".del").onclick=()=>{
@@ -397,8 +409,9 @@ function buildPost(){
   const mini=mkMini(s);
   const xt=h.querySelector(".xt");
   xt.insertBefore(mini,xt.firstChild);
+  h.insertBefore(s.imgBtn,h.querySelector(".mo"));
   h.querySelector(".mo").onclick=()=>card.classList.toggle("o");
-  card.append(h,s.imgBtn,cut.panel,th,tw,s.rd,s.audBtn);
+  card.append(h,cut.panel,th,tw,s.rd,s.audBtn);
   $("post").appendChild(card);
 }
 buildPost();
