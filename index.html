@@ -22,6 +22,7 @@ h1{text-align:center;font-size:28px;margin:16px 0 20px}
 .trow .sub{padding:10px 0 8px 8px;flex:none}
 .blk h2{display:flex;flex-wrap:wrap;align-items:center;margin:0 0 8px;min-height:34px;font-size:12px;font-weight:600;letter-spacing:.1em;color:#8e8e93}
 .blk h2 .ttl{flex:none;min-width:6em}
+.blk h2 .sl{margin-left:auto;font-size:17px;padding:4px 8px;line-height:1}
 .hb{display:flex}
 .sub{border:0;background:none;color:#8e8e93;padding:6px 8px;font-size:13px;font-family:inherit}
 .sub.mo{font-size:20px;line-height:1;padding:4px 10px}
@@ -29,11 +30,8 @@ h1{text-align:center;font-size:28px;margin:16px 0 20px}
 .xt{display:none;align-items:center;margin-left:2px}
 .blk.o .xt{display:flex}
 .xt .sub{padding:6px 7px;font-size:12px}
-.tw{position:relative}
-.tw .ta{padding-right:32px}
-.tw .sl{position:absolute;right:0;bottom:8px;border:0;background:none;color:#8e8e93;font-family:inherit;font-size:17px;padding:4px 8px;line-height:1}
 .sr{display:flex;align-items:flex-start}
-.sr .tw{flex:1;min-width:0}
+.sr .ta{flex:1;min-width:0}
 .fb .btn{display:block;width:auto;margin:0;padding:6px 8px;border:0;border-radius:0;background:none;font-size:13px;font-weight:400;color:#8e8e93;font-family:inherit}
 .fb .btn.sel{color:#111}
 .btn{display:block;width:100%;margin-top:10px;border:0;border-radius:99px;background:#111;color:#fff;padding:13px;font-size:15px;font-weight:600;font-family:inherit}
@@ -54,7 +52,6 @@ h1{text-align:center;font-size:28px;margin:16px 0 20px}
 .cut canvas{width:100%;display:block;margin:10px 0 4px;border:1px solid #ececf0}
 .note{font-size:12px;color:#8e8e93;margin:6px 0;line-height:1.6}
 .add,.adv summary,.go,.wipe{display:block;width:100%;margin:0;padding:11px 20px;border:0;border-radius:0;background:none;font-family:inherit;font-size:15px;color:#8e8e93;text-align:center}
-.add{padding:4px 20px 22px;margin-top:-8px}
 .adv{margin:0}
 .adv summary{list-style:none;cursor:pointer;position:relative;width:fit-content;padding:11px 22px;margin:0 auto}
 .adv summary::-webkit-details-marker{display:none}
@@ -172,12 +169,11 @@ function insSlash(t){
   save();
 }
 function mkTa(ph){const t=document.createElement("textarea");t.className="ta";t.rows=1;t.placeholder=ph;return t}
-function mkTw(ta){
-  const w=document.createElement("div");w.className="tw";
-  const b=document.createElement("button");b.type="button";b.className="sl";b.textContent="／";
+function mkSl(ta){
+  const b=document.createElement("button");b.type="button";b.className="sub sl";b.textContent="／";
   b.onmousedown=e=>e.preventDefault();
   b.onclick=()=>insSlash(ta);
-  w.append(ta,b);return w;
+  return b;
 }
 async function loadImg(f){
   const url=URL.createObjectURL(f),el=new Image();el.src=url;
@@ -237,8 +233,7 @@ function addSet(){
   h.innerHTML='<span class="ttl"></span><button class="sub mo" type="button">⋯</button><span class="xt"><span class="hb"><button class="sub up" type="button">↑</button><button class="sub dn" type="button">↓</button><button class="sub del" type="button">削除</button></span></span>';
   const pv=document.createElement("img");pv.className="pv";
   s.ta=mkTa("字幕");s.rd=mkTa("読み上げ修正");s.card=card;
-  const tw=mkTw(s.ta);
-  const sr=document.createElement("div");sr.className="sr";sr.append(tw,pv);
+  const sr=document.createElement("div");sr.className="sr";sr.append(s.ta,pv);
   s.imgBtn=fileBtn(false,fl=>{if(fl[0])s.setImg(fl[0])});
   s.setImg=async f=>{
     const o=await loadImg(f);
@@ -253,6 +248,7 @@ function addSet(){
   const xt=h.querySelector(".xt");
   xt.insertBefore(mini,xt.firstChild);
   h.insertBefore(s.imgBtn,h.querySelector(".mo"));
+  h.appendChild(mkSl(s.ta));
   h.querySelector(".mo").onclick=()=>card.classList.toggle("o");
   card.append(h,sr,s.rd);
   h.querySelector(".up").onclick=()=>moveSet(s,-1);
@@ -388,7 +384,6 @@ function buildPost(){
     });
   };
   s.ta=mkTa("字幕");s.rd=mkTa("読み上げ修正");s.card=card;
-  const tw=mkTw(s.ta);
   const cut=buildCut(s);
   s.imgBtn=fileBtn(true,fl=>{s.setImgs(fl);cut.load(fl.length===1?fl[0]:null)});
   s.setImgs=async fl=>{
@@ -403,8 +398,9 @@ function buildPost(){
   const xt=h.querySelector(".xt");
   xt.insertBefore(mini,xt.firstChild);
   h.insertBefore(s.imgBtn,h.querySelector(".mo"));
+  h.appendChild(mkSl(s.ta));
   h.querySelector(".mo").onclick=()=>card.classList.toggle("o");
-  card.append(h,cut.panel,th,tw,s.rd);
+  card.append(h,cut.panel,th,s.ta,s.rd);
   $("post").appendChild(card);
 }
 buildPost();
