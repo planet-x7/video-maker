@@ -19,7 +19,7 @@ h1{text-align:center;font-size:28px;margin:16px 0 20px}
 #post .blk{padding-top:6px}
 .trow{display:flex;align-items:flex-end;gap:6px}
 .trow .ta{flex:1;margin:0}
-.trow .sub{padding:12px 0 12px 8px;flex:none}
+.trow .sub{padding:10px 0 8px 8px;flex:none}
 .blk h2{display:flex;flex-wrap:wrap;align-items:center;margin:0 0 8px;min-height:34px;font-size:12px;font-weight:600;letter-spacing:.1em;color:#8e8e93}
 .blk h2 .ttl{flex:none}
 .hb{display:flex}
@@ -31,18 +31,14 @@ h1{text-align:center;font-size:28px;margin:16px 0 20px}
 .xt .sub{padding:6px 7px;font-size:12px}
 .tw{position:relative}
 .tw .ta{padding-right:32px}
-.tw .sl{position:absolute;right:0;bottom:12px;border:0;background:none;color:#8e8e93;font-family:inherit;font-size:17px;padding:4px 8px;line-height:1}
+.tw .sl{position:absolute;right:0;bottom:8px;border:0;background:none;color:#8e8e93;font-family:inherit;font-size:17px;padding:4px 8px;line-height:1}
 .sr{display:flex;align-items:flex-start}
 .sr .tw{flex:1;min-width:0}
-.fb .btn{display:flex;justify-content:space-between;align-items:center;width:100%;margin:0;background:none;border:0;border-radius:0;padding:15px 0;font-size:16px;font-weight:400;color:#111;text-align:left}
-.fb .btn::after{content:"›";color:#c4c4c9;font-size:22px;line-height:1}
-.fb.ib .btn{display:block;width:auto;padding:6px 8px;font-size:13px;color:#8e8e93}
-.fb.ib .btn::after{content:none}
-.fb.ib .btn.sel{color:#111}
+.fb .btn{display:block;width:auto;margin:0;padding:6px 8px;border:0;border-radius:0;background:none;font-size:13px;font-weight:400;color:#8e8e93;font-family:inherit}
+.fb .btn.sel{color:#111}
 .btn{display:block;width:100%;margin-top:10px;border:0;border-radius:99px;background:#111;color:#fff;padding:13px;font-size:15px;font-weight:600;font-family:inherit}
-.ta{display:block;width:100%;min-height:64px;border:0;border-bottom:1px solid #e3e3e8;border-radius:0;background:transparent;color:#111;padding:12px 0;font-size:17px;margin:0 0 6px;font-family:inherit;resize:none;outline:0}
+.ta{display:block;width:100%;border:0;border-bottom:1px solid #e3e3e8;border-radius:0;background:transparent;color:#111;padding:10px 0 8px;font-size:17px;line-height:1.4;margin:0 0 6px;font-family:inherit;resize:none;outline:0}
 .ta:focus{border-bottom-color:#111}
-.ta.s{min-height:44px}
 .ta::placeholder{color:#b0b0b8}
 .pv{display:none;flex:none;width:56px;height:56px;object-fit:contain;background:#fff;border-radius:8px;border:1px solid #ececf0;margin:6px 0 0 12px}
 .thumbs{display:flex;gap:8px;overflow-x:auto;margin:12px 0 4px}
@@ -154,16 +150,16 @@ function drawFrame(img,text,one){
   pix();
 }
 
-function fileBtn(label,multi,accept,onpick,inline){
-  const wrap=document.createElement("div");wrap.className="fb"+(inline?" ib":"");
+function fileBtn(multi,onpick){
+  const label="画像";
+  const wrap=document.createElement("div");wrap.className="fb";
   const b=document.createElement("button");b.type="button";b.className="btn";b.textContent=label;
-  const inp=document.createElement("input");inp.type="file";inp.style.display="none";
+  const inp=document.createElement("input");inp.type="file";inp.accept="image/*";inp.style.display="none";
   if(multi)inp.multiple=true;
-  if(accept)inp.accept=accept;
   b.onclick=()=>inp.click();
   inp.onchange=()=>{
     const fl=[...inp.files];
-    wrap.set(fl.length?(inline?label+" ✓":"✓ "+(fl.length>1?fl.length+"枚":fl[0].name.slice(0,18))):label);
+    wrap.set(fl.length?label+" ✓":label);
     onpick(fl);
   };
   wrap.set=t=>{b.textContent=t;b.classList.toggle("sel",t!==label)};
@@ -176,7 +172,7 @@ function insSlash(t){
   t.focus();try{t.setSelectionRange(a+1,a+1)}catch(e){}
   save();
 }
-function mkTa(ph,cls){const t=document.createElement("textarea");t.className="ta"+(cls?" "+cls:"");t.placeholder=ph;return t}
+function mkTa(ph){const t=document.createElement("textarea");t.className="ta";t.rows=1;t.placeholder=ph;return t}
 function mkTw(ta){
   const w=document.createElement("div");w.className="tw";
   const b=document.createElement("button");b.type="button";b.className="sl";b.textContent="／";
@@ -224,12 +220,14 @@ function mkMini(s){
   const d=document.createElement("div");d.className="mini";
   const mkc=t=>{const b=document.createElement("button");b.type="button";b.className="sub";b.textContent=t;d.appendChild(b);return b};
   const b1=mkc("読み"),b2=mkc("音声");
+  const inp=document.createElement("input");inp.type="file";inp.style.display="none";d.appendChild(inp);
   const set1=v=>{s.rd.classList.toggle("hide",!v);b1.classList.toggle("on",v)};
-  const set2=v=>{s.audBtn.classList.toggle("hide",!v);b2.classList.toggle("on",v)};
   b1.onclick=()=>{const v=s.rd.classList.contains("hide");set1(v);if(v){grow(s.rd);s.rd.focus()}};
-  b2.onclick=()=>set2(s.audBtn.classList.contains("hide"));
-  s.reveal=()=>{if(s.rd.value.trim())set1(true);if(s.file)set2(true)};
-  s.hideAll=()=>{set1(false);set2(false)};
+  b2.onclick=()=>inp.click();
+  inp.onchange=()=>s.setAudio(inp.files[0]||null);
+  s.setAudio=f=>{s.file=f;b2.textContent=f?"音声 ✓":"音声";b2.classList.toggle("on",!!f);if(!f)inp.value="";save()};
+  s.reveal=()=>{if(s.rd.value.trim())set1(true)};
+  s.hideAll=()=>{set1(false);s.setAudio(null)};
   s.hideAll();
   return d;
 }
@@ -239,27 +237,25 @@ function addSet(){
   const h=document.createElement("h2");
   h.innerHTML='<span class="ttl"></span><button class="sub mo" type="button">⋯</button><span class="xt"><span class="hb"><button class="sub up" type="button">↑</button><button class="sub dn" type="button">↓</button><button class="sub del" type="button">削除</button></span></span>';
   const pv=document.createElement("img");pv.className="pv";
-  s.ta=mkTa("字幕");s.rd=mkTa("読み上げ修正","s");s.card=card;
+  s.ta=mkTa("字幕");s.rd=mkTa("読み上げ修正");s.card=card;
   const tw=mkTw(s.ta);
   const sr=document.createElement("div");sr.className="sr";sr.append(tw,pv);
-  s.imgBtn=fileBtn("画像",false,"image/*",fl=>{if(fl[0])s.setImg(fl[0])},1);
-  s.audBtn=fileBtn("音声ファイルを選択",false,"",fl=>{s.setAudio(fl[0]||null)});
+  s.imgBtn=fileBtn(false,fl=>{if(fl[0])s.setImg(fl[0])});
   s.setImg=async f=>{
     const o=await loadImg(f);
     s.img=o.el;s.imgFile=f;pv.src=o.url;pv.style.display="block";
     s.imgBtn.set("画像 ✓");save();
   };
-  s.setAudio=f=>{s.file=f;s.audBtn.set(f?"✓ "+f.name.slice(0,18):"音声ファイルを選択");if(f&&s.reveal)s.reveal();save()};
   s.clear=()=>{
-    s.img=null;s.imgFile=null;s.file=null;pv.style.display="none";
-    s.ta.value="";s.rd.value="";s.imgBtn.reset();s.audBtn.reset();s.hideAll();save();
+    s.img=null;s.imgFile=null;pv.style.display="none";
+    s.ta.value="";s.rd.value="";s.imgBtn.reset();s.hideAll();save();
   };
   const mini=mkMini(s);
   const xt=h.querySelector(".xt");
   xt.insertBefore(mini,xt.firstChild);
   h.insertBefore(s.imgBtn,h.querySelector(".mo"));
   h.querySelector(".mo").onclick=()=>card.classList.toggle("o");
-  card.append(h,sr,s.rd,s.audBtn);
+  card.append(h,sr,s.rd);
   h.querySelector(".up").onclick=()=>moveSet(s,-1);
   h.querySelector(".dn").onclick=()=>moveSet(s,1);
   h.querySelector(".del").onclick=()=>{
@@ -392,30 +388,28 @@ function buildPost(){
       th.appendChild(d);
     });
   };
-  s.ta=mkTa("字幕");s.rd=mkTa("読み上げ修正","s");s.card=card;
+  s.ta=mkTa("字幕");s.rd=mkTa("読み上げ修正");s.card=card;
   const tw=mkTw(s.ta);
   const cut=buildCut(s);
-  s.imgBtn=fileBtn("画像",true,"image/*",fl=>{s.setImgs(fl);cut.load(fl.length===1?fl[0]:null)},1);
-  s.audBtn=fileBtn("音声ファイルを選択",false,"",fl=>s.setAudio(fl[0]||null));
+  s.imgBtn=fileBtn(true,fl=>{s.setImgs(fl);cut.load(fl.length===1?fl[0]:null)});
   s.setImgs=async fl=>{
     s.imgs=[];
     for(const f of fl){const o=await loadImg(f);o.file=f;o.el.__post=true;s.imgs.push(o)}
     render();s.imgBtn.set(fl.length?"画像 ✓":"画像");save();
   };
-  s.setAudio=f=>{s.file=f;s.audBtn.set(f?"✓ "+f.name.slice(0,18):"音声ファイルを選択");if(f&&s.reveal)s.reveal();save()};
   h.querySelector(".del").onclick=()=>{
-    s.imgs=[];s.file=null;s.ta.value="";s.rd.value="";render();s.imgBtn.reset();s.audBtn.reset();s.hideAll();cut.load(null);save();
+    s.imgs=[];s.ta.value="";s.rd.value="";render();s.imgBtn.reset();s.hideAll();cut.load(null);save();
   };
   const mini=mkMini(s);
   const xt=h.querySelector(".xt");
   xt.insertBefore(mini,xt.firstChild);
   h.insertBefore(s.imgBtn,h.querySelector(".mo"));
   h.querySelector(".mo").onclick=()=>card.classList.toggle("o");
-  card.append(h,cut.panel,th,tw,s.rd,s.audBtn);
+  card.append(h,cut.panel,th,tw,s.rd);
   $("post").appendChild(card);
 }
 buildPost();
-const titleTa=mkTa("タイトル","s");
+const titleTa=mkTa("タイトル");
 (function(){
   const card=document.createElement("div");card.className="blk";
   const row=document.createElement("div");row.className="trow";
