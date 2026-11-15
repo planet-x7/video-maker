@@ -96,7 +96,7 @@ h1{text-align:center;font-size:30px;margin:16px 0 20px}
 
 <script>
 const W=1080,H=1920,BG="#EAFAFF";
-const CAP_C=Math.round(H*0.285-110*1.3),IMG_TOP=Math.round(H*0.315);
+const CAP_C=411,PW=Math.round(W*0.79),POST_TOP=637,COM_TOP=678,BOT=Math.round(H*0.9);
 let FR=0;
 const cv=document.getElementById("cv"),ctx=cv.getContext("2d");
 const $=id=>document.getElementById(id);
@@ -132,16 +132,25 @@ function drawFrame(img,text,one){
   if(img===LI&&text===LT&&one===LO){pix();return}
   LI=img;LT=text;LO=one;
   drawBase();
-  ctx.fillStyle="#000";ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.textAlign="center";ctx.textBaseline="middle";
   let fs=110,lines;
   const fam='"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif';
   for(;fs>=48;fs-=4){ctx.font="900 "+fs+"px "+fam;lines=wrap(text,W*0.9);if(lines.length<=(one?1:2))break}
   const lh=fs*1.3;
-  lines.forEach((l,i)=>ctx.fillText(l,W/2,CAP_C+(i-(lines.length-1)/2)*lh));
+  ctx.strokeStyle="#fff";ctx.lineJoin="round";ctx.lineWidth=fs*0.055;
+  lines.forEach((l,i)=>{
+    const y=CAP_C+(i-(lines.length-1)/2)*lh;
+    ctx.fillStyle="#000";
+    ctx.strokeText(l,W/2,y);
+    ctx.fillText(l,W/2,y);
+  });
   if(img){
-    const r=Math.min(W*(img.__post?0.935:1)/img.naturalWidth,(H*0.9-IMG_TOP)/img.naturalHeight);
+    const tw=img.__post?PW:W,top=img.__post?POST_TOP:COM_TOP;
+    let r=tw/img.naturalWidth;
+    if(img.naturalHeight*r>BOT-top)r=(BOT-top)/img.naturalHeight;
     const w=img.naturalWidth*r,h=img.naturalHeight*r;
-    ctx.drawImage(img,W/2-w/2,IMG_TOP,w,h);
+    if(w<tw-0.5){ctx.fillStyle="#fff";ctx.fillRect((W-tw)/2,top,tw,h)}
+    ctx.drawImage(img,W/2-w/2,top,w,h);
   }
   pix();
 }
