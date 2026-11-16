@@ -96,7 +96,7 @@ h1{text-align:center;font-size:30px;margin:16px 0 20px}
 
 <script>
 const W=1080,H=1920,BG="#EAFAFF";
-const CAP_C=411,PW=Math.round(W*0.79),POST_TOP=637,COM_TOP=678,BOT=Math.round(H*0.9);
+const CAP_C=380,CAP_W=790,CAP_H=440,PW=Math.round(W*0.79),POST_TOP=637,COM_TOP=678,BOT=Math.round(H*0.9);
 let FR=0;
 const cv=document.getElementById("cv"),ctx=cv.getContext("2d");
 const $=id=>document.getElementById(id);
@@ -135,7 +135,10 @@ function drawFrame(img,text,one){
   ctx.textAlign="center";ctx.textBaseline="middle";
   let fs=110,lines;
   const fam='"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif';
-  for(;fs>=48;fs-=4){ctx.font="900 "+fs+"px "+fam;lines=wrap(text,W*0.9);if(lines.length<=(one?1:2))break}
+  for(;;fs-=4){
+    ctx.font="900 "+fs+"px "+fam;lines=wrap(text,CAP_W);
+    if((lines.length<=(one?1:2)&&lines.length*fs*1.3<=CAP_H)||fs<=32)break;
+  }
   const lh=fs*1.3;
   ctx.strokeStyle="#fff";ctx.lineJoin="round";ctx.lineWidth=fs*0.055;
   lines.forEach((l,i)=>{
