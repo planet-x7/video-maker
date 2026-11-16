@@ -96,7 +96,7 @@ h1{text-align:center;font-size:30px;margin:16px 0 20px}
 
 <script>
 const W=1080,H=1920,BG="#EAFAFF";
-const CAP_C=380,CAP_W=790,CAP_H=440,PW=Math.round(W*0.79),POST_TOP=637,COM_TOP=678,BOT=Math.round(H*0.9);
+const CAP_C=366,FS=88,CAP_W=11*FS+2,PW=Math.round(W*0.79),POST_TOP=637,COM_TOP=678,BOT=Math.round(H*0.9);
 let FR=0;
 const cv=document.getElementById("cv"),ctx=cv.getContext("2d");
 const $=id=>document.getElementById(id);
@@ -104,7 +104,7 @@ const sets=[];
 const SPK=2;
 const fx1a={fixed:true,lines:["という投稿が/話題になっている"],fixedText:"という投稿が話題になっている",gapAfter:0.2};
 const fx1b={fixed:true,lines:["ネットでは"],fixedText:"ネットでは",gapAfter:0.4};
-const fx2={fixed:true,lines:["などの反応があった"],fixedText:"などの反応があった",one:true};
+const fx2={fixed:true,lines:["などの反応があった"],fixedText:"などの反応があった"};
 
 function drawBase(){ctx.fillStyle=BG;ctx.fillRect(0,0,W,H)}
 function wrap(t,max){
@@ -126,21 +126,18 @@ function wrap(t,max){
   }
   return lines;
 }
-let LI=null,LT=null,LO=null;
+let LI=null,LT=null;
 function pix(){ctx.fillStyle=(FR++&1)?"#EAFAFF":"#E9FAFF";ctx.fillRect(0,H-6,6,6)}
-function drawFrame(img,text,one){
-  if(img===LI&&text===LT&&one===LO){pix();return}
-  LI=img;LT=text;LO=one;
+function drawFrame(img,text){
+  if(img===LI&&text===LT){pix();return}
+  LI=img;LT=text;
   drawBase();
   ctx.textAlign="center";ctx.textBaseline="middle";
-  let fs=110,lines;
   const fam='"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif';
-  for(;;fs-=4){
-    ctx.font="900 "+fs+"px "+fam;lines=wrap(text,CAP_W);
-    if((lines.length<=(one?1:3)&&lines.length*fs*1.3<=CAP_H)||fs<=32)break;
-  }
-  const lh=fs*1.3;
-  ctx.strokeStyle="#fff";ctx.lineJoin="round";ctx.lineWidth=fs*0.055;
+  ctx.font="900 "+FS+"px "+fam;
+  const lines=wrap(text,CAP_W);
+  const lh=FS*1.3;
+  ctx.strokeStyle="#fff";ctx.lineJoin="round";ctx.lineWidth=FS*0.055;
   lines.forEach((l,i)=>{
     const y=CAP_C+(i-(lines.length-1)/2)*lh;
     ctx.fillStyle="#000";
@@ -578,7 +575,7 @@ $("go").onclick=async()=>{
       let cur=all[0];
       for(const s of all){if(s.t0<=t)cur=s}
       const seg=cur.segs.find(g=>t>=g.t0&&t<g.t1)||(t<cur.t0+cur.dur?cur.segs[0]:cur.segs[cur.segs.length-1]);
-      return cur.isPost?[post.imgs[seg.i].el,seg.text]:[cur.img,seg.text,cur.one];
+      return cur.isPost?[post.imgs[seg.i].el,seg.text]:[cur.img,seg.text];
     };
     const dest=ac.createMediaStreamDestination();
     const stream=cv.captureStream(30);
